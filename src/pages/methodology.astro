@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+---
+
+<Base
+  title={`How ${SITE.name} tests and rates prop firms — our methodology`}
+  description="The exact scoring system behind our prop firm ratings: payout reliability, rule fairness, real cost, platform quality and firm stability — weighted and public."
+>
+  <div class="wrap">
+    <header class="hub-head">
+      <h1>Our review methodology</h1>
+      <p>Every rating on {SITE.name} comes from the same public scoring system. Firms cannot pay to improve a score.</p>
+    </header>
+    <article class="article-body">
+      <h2>The five scoring pillars</h2>
+      <table>
+        <thead>
+          <tr><th>Pillar</th><th>Weight</th><th>What we measure</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Payout reliability</td><td>35%</td><td>Documented payout proof, average processing time, denial reports, payout-policy changes</td></tr>
+          <tr><td>Rule fairness</td><td>25%</td><td>Drawdown type (static vs trailing), consistency rules, hidden restrictions, retroactive changes</td></tr>
+          <tr><td>Real cost</td><td>15%</td><td>True cost to reach a funded account, including realistic retry rates — not just sticker price</td></tr>
+          <tr><td>Platform &amp; execution</td><td>15%</td><td>Platforms offered, spreads/commissions, slippage in our test trades, uptime</td></tr>
+          <tr><td>Stability &amp; transparency</td><td>10%</td><td>Company age, legal entity, leadership visibility, financial red flags</td></tr>
+        </tbody>
+      </table>
+      <h2>How we gather data</h2>
+      <ul>
+        <li>We purchase evaluations with our own funds and trade them.</li>
+        <li>We request real payouts before scoring payout reliability.</li>
+        <li>We re-verify pricing and rules monthly; each article displays its last-updated date.</li>
+        <li>We log every rule change in our shutdown &amp; rule-change tracker.</li>
+      </ul>
+      <h2>Affiliate disclosure</h2>
+      <p>
+        Some outbound links are affiliate links. They fund challenge purchases and never influence
+        scores — several firms we link to have low ratings, and several top-rated firms pay us
+        nothing. If a firm pressures us to alter a review, we disclose it publicly.
+      </p>
+    </article>
+  </div>
+</Base>

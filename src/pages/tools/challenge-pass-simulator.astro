@@ -1,0 +1,194 @@
+---
+import Tool from '../../layouts/Tool.astro';
+
+const faqs = [
+  {
+    q: 'How accurate is a Monte Carlo challenge simulation?',
+    a: 'It is exact for the assumptions you feed it: the simulator runs 20,000 randomized challenge attempts using your win rate, risk:reward and sizing against the profit target and drawdown rules. Its limits are your inputs — real win rates drift under pressure, so treat results as an upper bound and test with a win rate 5 points below your backtest.',
+  },
+  {
+    q: 'What win rate do I need to pass a prop firm challenge?',
+    a: 'It depends on risk:reward. At 1:2 RR, roughly a 40% win rate gives a strong positive expectancy and a high pass probability at 1% risk. At 1:1 RR you need about 55%+. Below those thresholds, more attempts just resample the same negative expectancy — no firm choice fixes that.',
+  },
+  {
+    q: 'Does risking more per trade increase my chance of passing?',
+    a: 'It increases speed and variance at the same time: you pass faster when you pass, but drawdown breaches multiply. For most edges, pass probability peaks around 1–1.5% risk per trade and falls off sharply above 2% — run the simulator at 1%, 2% and 3% and watch the breach rate, not just the pass rate.',
+  },
+  {
+    q: 'Why do I fail challenges with a profitable strategy?',
+    a: 'Two mathematical reasons: your daily loss limit converts an ordinary loss cluster into a terminal event if you oversize, and 90-day-style expectations push overtrading. A profitable strategy with 1:2 RR and 45% wins still loses 3+ in a row about once every 15 trades — sizing must survive that.',
+  },
+];
+---
+
+<Tool
+  title="Prop Firm Challenge Pass Probability Simulator"
+  metaTitle="Prop Firm Challenge Pass Probability Simulator (Monte Carlo)"
+  description="Simulate 20,000 prop firm challenge attempts with your win rate, risk:reward and position sizing against real profit-target and drawdown rules — before you pay for one."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="sim-winrate">Win rate (%)</label>
+        <input type="number" id="sim-winrate" value="45" min="1" max="99" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-rr">Risk : reward (R multiple)</label>
+        <input type="number" id="sim-rr" value="2" step="0.1" min="0.1" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-risk">Risk per trade (%)</label>
+        <input type="number" id="sim-risk" value="1" step="0.1" min="0.1" max="10" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-target">Profit target (%)</label>
+        <input type="number" id="sim-target" value="8" step="0.5" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-maxdd">Max drawdown (%)</label>
+        <input type="number" id="sim-maxdd" value="10" step="0.5" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-dailydd">Daily loss limit (%)</label>
+        <input type="number" id="sim-dailydd" value="5" step="0.5" min="0.5" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-perday">Trades per day</label>
+        <input type="number" id="sim-perday" value="3" min="1" max="50" />
+      </div>
+      <div class="tool-field">
+        <label for="sim-maxtrades">Max trades before giving up</label>
+        <input type="number" id="sim-maxtrades" value="200" min="10" max="1000" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="sim-run">Run 20,000 simulations</button>
+    </div>
+    <div class="tool-results" id="sim-results">
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="label">Pass probability</div>
+          <div class="value" id="sim-pass">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Breach probability</div>
+          <div class="value" id="sim-breach">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Median trades to pass</div>
+          <div class="value" id="sim-trades">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Expected attempts to fund</div>
+          <div class="value" id="sim-attempts">—</div>
+        </div>
+      </div>
+      <p id="sim-comment" style="margin-top:1rem; font-weight:600"></p>
+      <p class="tool-note">
+        Model: fixed win rate and R-multiple per trade, losses breach on daily and max drawdown
+        rules, day ends after your trades-per-day or a -2× risk day. Expectancy per trade:
+        <span id="sim-expectancy"></span>. Simulations are randomized — results vary ±1% run to run.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Know your odds before you pay</h2>
+    <p>
+      Prop firms publish pass rates of 10–30% per attempt. This simulator tells you <em>your</em>
+      number: it plays out 20,000 complete challenges with your statistics against the standard
+      rule set (defaults match the 8%-target, 5%/10% drawdown structure used by
+      <a href="/reviews/ftmo-review/">FTMO</a> and
+      <a href="/reviews/fundednext-review/">FundedNext</a>). Multiply the expected attempts by your
+      challenge fee — that's your <a href="/tools/challenge-cost-calculator/">true cost of getting
+      funded</a>.
+    </p>
+    <h2>The three levers, ranked</h2>
+    <p>
+      Run the simulator three times and you'll rediscover the industry's core math: win rate and
+      risk:reward move pass probability most (they're your edge — hard to change quickly), while
+      <strong>risk per trade is the lever you control today</strong>. Watch what happens to breach
+      probability when you move risk from 1% to 3% with everything else fixed. Then read
+      <a href="/guides/how-to-pass-a-prop-firm-challenge/">the full passing playbook</a> and
+      <a href="/guides/prop-firm-drawdown-explained/">how drawdown rules actually work</a>.
+    </p>
+  </article>
+
+  <script>
+    const N = 20000;
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+
+    document.getElementById('sim-run')!.addEventListener('click', () => {
+      const winRate = (parseFloat($('sim-winrate').value) || 45) / 100;
+      const rr = parseFloat($('sim-rr').value) || 2;
+      const risk = (parseFloat($('sim-risk').value) || 1) / 100;
+      const target = (parseFloat($('sim-target').value) || 8) / 100;
+      const maxDd = (parseFloat($('sim-maxdd').value) || 10) / 100;
+      const dailyDd = (parseFloat($('sim-dailydd').value) || 5) / 100;
+      const perDay = Math.max(1, parseInt($('sim-perday').value) || 3);
+      const maxTrades = Math.max(10, parseInt($('sim-maxtrades').value) || 200);
+
+      let passes = 0;
+      let breaches = 0;
+      const tradesToPass: number[] = [];
+
+      for (let i = 0; i < N; i++) {
+        let equity = 0; // as fraction of starting balance
+        let dayPnl = 0;
+        let tradesToday = 0;
+        let outcome = 'timeout';
+        let t = 0;
+
+        for (t = 1; t <= maxTrades; t++) {
+          const pnl = Math.random() < winRate ? risk * rr : -risk;
+          equity += pnl;
+          dayPnl += pnl;
+          tradesToday++;
+
+          if (dayPnl <= -dailyDd) { outcome = 'breach'; break; }
+          if (equity <= -maxDd) { outcome = 'breach'; break; }
+          if (equity >= target) { outcome = 'pass'; break; }
+
+          // end of day: hit trade count, or self-imposed stop at 2 losses' worth
+          if (tradesToday >= perDay || dayPnl <= -2 * risk) {
+            dayPnl = 0;
+            tradesToday = 0;
+          }
+        }
+
+        if (outcome === 'pass') { passes++; tradesToPass.push(t); }
+        else if (outcome === 'breach') breaches++;
+      }
+
+      const passP = passes / N;
+      tradesToPass.sort((a, b) => a - b);
+      const median = tradesToPass.length ? tradesToPass[Math.floor(tradesToPass.length / 2)] : 0;
+      const expectancy = winRate * rr - (1 - winRate);
+
+      document.getElementById('sim-pass')!.textContent = (passP * 100).toFixed(1) + '%';
+      document.getElementById('sim-breach')!.textContent = ((breaches / N) * 100).toFixed(1) + '%';
+      document.getElementById('sim-trades')!.textContent = median ? String(median) : '—';
+      document.getElementById('sim-attempts')!.textContent = passP > 0.005 ? (1 / passP).toFixed(1) : '100+';
+      document.getElementById('sim-expectancy')!.textContent =
+        expectancy >= 0 ? '+' + expectancy.toFixed(2) + 'R' : expectancy.toFixed(2) + 'R';
+
+      const comment = document.getElementById('sim-comment')!;
+      if (expectancy <= 0) {
+        comment.textContent =
+          '⚠ Your expectancy is negative — no amount of attempts or firm selection fixes this. Improve the edge on demo first.';
+      } else if (passP >= 0.6) {
+        comment.textContent =
+          '✓ Strong setup. Your stats pass most attempts — pick a firm by payout reliability, not price.';
+      } else if (passP >= 0.35) {
+        comment.textContent =
+          'Decent odds — budget for ~' + Math.ceil(1 / passP) + ' attempts, or cut risk per trade and re-run: breach rate usually falls faster than pass rate.';
+      } else {
+        comment.textContent =
+          'Low pass odds despite ' + (expectancy > 0 ? 'a positive edge' : '') + ' — try lower risk per trade and fewer trades per day, then re-run.';
+      }
+
+      document.getElementById('sim-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

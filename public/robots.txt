@@ -1,0 +1,6 @@
+# Allow all crawlers, including AI engines (AEO: being crawlable by
+# GPTBot/ClaudeBot/PerplexityBot is how the site gets cited in AI answers).
+User-agent: *
+Allow: /
+
+Sitemap: https://propfirmfundedaccounts.com/sitemap-index.xml

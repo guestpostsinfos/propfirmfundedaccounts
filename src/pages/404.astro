@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+---
+
+<Base
+  title={`Page not found | ${SITE.name}`}
+  description="This page doesn't exist or has moved. Find prop firm reviews, comparisons, guides and free trading calculators from the homepage."
+>
+  <div class="wrap">
+    <header class="hero">
+      <h1>404 — that page breached its drawdown</h1>
+      <p class="lede">
+        The page you're looking for doesn't exist or has moved. These will get you back on track:
+      </p>
+      <ul>
+        <li><a href="/best/best-prop-firms/">Best prop firms of 2026</a></li>
+        <li><a href="/reviews/">All firm reviews</a></li>
+        <li><a href="/tools/">Free calculators &amp; tools</a></li>
+        <li><a href="/guides/what-is-a-prop-firm/">New here? What is a prop firm</a></li>
+      </ul>
+      <p><a class="btn" href="/">Back to homepage</a></p>
+    </header>
+  </div>
+</Base>

@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+---
+
+<Base
+  title={`Contact ${SITE.name}`}
+  description={`Report a payout dispute, request a correction, or suggest a prop firm for ${SITE.name} to review.`}
+>
+  <div class="wrap">
+    <header class="hub-head">
+      <h1>Contact us</h1>
+    </header>
+    <article class="article-body">
+      <p>We read everything. The fastest ways to reach us:</p>
+      <ul>
+        <li><strong>Corrections &amp; data errors:</strong> email <a href="mailto:research@propfirmfundedaccounts.com">research@propfirmfundedaccounts.com</a> — corrections ship within 48 hours with a changelog.</li>
+        <li><strong>Payout disputes:</strong> send evidence (dashboard screenshots, support tickets) to the same address. Verified disputes feed into firm payout scores.</li>
+        <li><strong>Review requests:</strong> tell us which firm to test next.</li>
+      </ul>
+      <p>
+        We do not accept paid placements, sponsored reviews, or "reputation management" requests
+        from prop firms.
+      </p>
+    </article>
+  </div>
+</Base>

@@ -1,0 +1,135 @@
+---
+import Tool from '../../layouts/Tool.astro';
+
+const faqs = [
+  {
+    q: 'How much does it really cost to get a prop firm funded account?',
+    a: 'Expected cost = challenge fee ÷ your pass probability per attempt. At a 30% pass rate, a $619 FTMO challenge really costs about $2,060 in expectation; at 60% it costs about $1,030. This is why improving your pass rate beats hunting discounts — and why realistic self-assessment saves more than any coupon code.',
+  },
+  {
+    q: 'How many attempts does the average trader need to pass?',
+    a: 'At typical per-attempt pass rates of 10–30%, the expected number of attempts is 3–10. Well-prepared traders following strict sizing rules report substantially better. Budget at least 2–3 attempts before buying your first challenge.',
+  },
+  {
+    q: 'Are challenge fee discounts worth chasing?',
+    a: 'A 20% discount on the fee is worth exactly 20% of expected cost — useful but small compared to pass-rate improvements. Moving your pass rate from 30% to 50% cuts expected cost by 40%. Beware firms running permanent 60–80% discounts: aggressive discounting was a leading indicator among the 80+ firms that collapsed in 2024–2026.',
+  },
+  {
+    q: 'Do refundable challenge fees change the math?',
+    a: 'Yes, if you reach payout: FTMO-style refunds return the fee with your first profit split, making your successful attempt effectively free — but you still pay full price for every failed attempt. The calculator’s expected cost already reflects the failed attempts that precede a pass.',
+  },
+];
+---
+
+<Tool
+  title="True Prop Firm Challenge Cost Calculator"
+  metaTitle="True Prop Firm Challenge Cost Calculator (Fee × Attempts)"
+  description="The real cost of getting funded: expected attempts and total spend from your fee and realistic pass rate, with cumulative odds per attempt."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="cc-fee">Challenge fee ($)</label>
+        <input type="number" id="cc-fee" value="619" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="cc-pass">Your pass rate per attempt (%)</label>
+        <input type="number" id="cc-pass" value="30" min="1" max="99" />
+      </div>
+      <div class="tool-field">
+        <label for="cc-refund">Fee refunded on first payout?</label>
+        <select id="cc-refund">
+          <option value="yes">Yes (FTMO-style)</option>
+          <option value="no" selected>No</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="cc-calc">Calculate true cost</button>
+    </div>
+    <div class="tool-results" id="cc-results">
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="label">Expected attempts</div>
+          <div class="value" id="cc-attempts">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Expected total spend</div>
+          <div class="value" id="cc-total">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Odds funded within 3 attempts</div>
+          <div class="value" id="cc-three">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Budget for 90% certainty</div>
+          <div class="value" id="cc-ninety">—</div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Attempt</th><th>Chance you're funded by now</th><th>Cumulative spend</th></tr>
+        </thead>
+        <tbody id="cc-table"></tbody>
+      </table>
+      <p class="tool-note" id="cc-note"></p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Sticker prices lie — expectation doesn't</h2>
+    <p>
+      Comparing firms by challenge fee is like comparing casinos by chip price. The number that
+      matters is fee ÷ pass rate: your expected total spend to reach a funded account. A "cheap"
+      $129 challenge with rules that cut your pass rate in half costs more than a $449 one you pass
+      — the full argument, with firm-by-firm numbers, is in our
+      <a href="/best/cheapest-prop-firms/">cheapest prop firms ranking</a>.
+    </p>
+    <p>
+      Don't know your pass rate? Estimate it honestly with the
+      <a href="/tools/challenge-pass-simulator/">pass probability simulator</a> using your actual
+      win rate and risk:reward — then come back. If your expected spend exceeds a few challenge
+      fees, the cheapest purchase is more demo time, not another discount code. Firm-by-firm fees
+      are in <a href="/best/best-prop-firms/">our 2026 rankings</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+    document.getElementById('cc-calc')!.addEventListener('click', () => {
+      const fee = parseFloat($('cc-fee').value) || 0;
+      const p = (parseFloat($('cc-pass').value) || 30) / 100;
+      const refund = ($('cc-refund') as unknown as HTMLSelectElement).value === 'yes';
+      if (fee <= 0 || p <= 0 || p >= 1) return;
+
+      const expAttempts = 1 / p;
+      // expected paid attempts: with refund, the successful attempt is free (refunded at payout)
+      const expSpend = fee * (refund ? expAttempts - 1 : expAttempts);
+      const within3 = 1 - Math.pow(1 - p, 3);
+      const n90 = Math.ceil(Math.log(0.1) / Math.log(1 - p));
+
+      document.getElementById('cc-attempts')!.textContent = expAttempts.toFixed(1);
+      document.getElementById('cc-total')!.textContent = usd(expSpend);
+      document.getElementById('cc-three')!.textContent = (within3 * 100).toFixed(0) + '%';
+      document.getElementById('cc-ninety')!.textContent = usd(n90 * fee) + ` (${n90} attempts)`;
+
+      const rows: string[] = [];
+      let cum = 0;
+      for (let n = 1; n <= Math.min(n90, 10); n++) {
+        cum = 1 - Math.pow(1 - p, n);
+        rows.push(
+          `<tr><td>${n}</td><td>${(cum * 100).toFixed(0)}%</td><td>${usd(n * fee)}</td></tr>`
+        );
+      }
+      document.getElementById('cc-table')!.innerHTML = rows.join('');
+      document.getElementById('cc-note')!.textContent = refund
+        ? 'Expected spend assumes the successful attempt’s fee is refunded at first payout.'
+        : 'Tip: FTMO-style refundable fees reduce expected spend by one fee if you reach payout.';
+
+      document.getElementById('cc-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

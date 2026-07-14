@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../consts';
+
+const tools = [
+  {
+    href: '/tools/position-size-calculator/',
+    title: 'Position Size Calculator',
+    desc: 'Lot size from account, risk % and stop distance — with prop-firm-safe presets for forex, gold and indices.',
+  },
+  {
+    href: '/tools/challenge-pass-simulator/',
+    title: 'Challenge Pass Probability Simulator',
+    desc: 'Monte Carlo simulation of your win rate, risk:reward and sizing against real challenge rules — see your true pass odds before you pay.',
+  },
+  {
+    href: '/tools/drawdown-calculator/',
+    title: 'Drawdown & Breach Calculator',
+    desc: 'Exactly how much room you have left before a daily or max drawdown breach — static and trailing modes.',
+  },
+  {
+    href: '/tools/challenge-cost-calculator/',
+    title: 'True Challenge Cost Calculator',
+    desc: 'Expected total spend to get funded based on fee and realistic pass rates — the number sticker prices hide.',
+  },
+  {
+    href: '/tools/profit-split-calculator/',
+    title: 'Profit Split & Payout Calculator',
+    desc: 'Your real take-home from a payout: split tiers, fee refunds and effective return on your challenge fee.',
+  },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Free Prop Firm Trading Tools & Calculators',
+    description:
+      'Free calculators built for prop firm traders: position sizing, drawdown breach room, challenge pass probability, true challenge cost and payout math.',
+    url: `${SITE.url}/tools/`,
+    isPartOf: { '@id': `${SITE.url}/#website` },
+  },
+];
+---
+
+<Base
+  title={`Free Prop Firm Calculators & Tools | ${SITE.name}`}
+  description="Five free calculators built for prop firm traders: position sizing, challenge pass probability (Monte Carlo), drawdown breach room, true challenge cost and payout splits."
+  schema={schema}
+>
+  <div class="wrap">
+    <header class="hub-head">
+      <h1>Prop firm tools &amp; calculators</h1>
+      <p>
+        Free, no-signup calculators built specifically around prop firm rules — daily drawdowns,
+        trailing floors, profit targets and split tiers. Everything runs in your browser; we never
+        see your numbers.
+      </p>
+    </header>
+    <ul class="card-grid">
+      {tools.map((t) => (
+        <li class="card">
+          <span class="cat">Free tool</span>
+          <h3><a href={t.href}>{t.title}</a></h3>
+          <p>{t.desc}</p>
+        </li>
+      ))}
+    </ul>
+    <p>
+      New here? Start with <a href="/guides/what-is-a-prop-firm/">what a prop firm is</a> and
+      <a href="/guides/how-to-pass-a-prop-firm-challenge/">how to pass a challenge</a>, then pick a
+      firm from our <a href="/best/best-prop-firms/">2026 rankings</a>.
+    </p>
+  </div>
+</Base>

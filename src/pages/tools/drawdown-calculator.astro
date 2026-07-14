@@ -1,0 +1,161 @@
+---
+import Tool from '../../layouts/Tool.astro';
+
+const faqs = [
+  {
+    q: 'How is daily drawdown calculated at prop firms?',
+    a: 'Most firms compute it from your start-of-day balance or equity (check which — it matters): if yesterday closed at $102,000 with a 5% daily limit, your equity may not touch $96,900 today. Floating losses count in real time at nearly every firm, so an open position can breach you before it hits its stop.',
+  },
+  {
+    q: 'What is trailing drawdown and why is it dangerous?',
+    a: 'Trailing drawdown moves your breach floor up as your equity makes new highs. With a $5,000 trail on a $100,000 account, reaching $105,000 moves the floor to $100,000 — your starting balance becomes a breach level. It converts profits into risk and is the leading cause of funded-account failure at futures firms like Apex.',
+  },
+  {
+    q: 'Does the daily drawdown reset at midnight?',
+    a: 'It resets at a fixed server time set by the firm — often 5pm ET (futures/CME close) or midnight CET for European brokers, which is usually not your local midnight. Holding a floating loss into the reset boundary is one of the most common avoidable breaches.',
+  },
+  {
+    q: 'How much of my drawdown should I actually use?',
+    a: 'Professional practice is to treat 40–50% of the official limits as your personal maximum: a -2% personal daily stop against a 5% limit makes an official breach nearly impossible and interrupts revenge-trading spirals early.',
+  },
+];
+---
+
+<Tool
+  title="Prop Firm Drawdown & Breach Calculator"
+  metaTitle="Prop Firm Drawdown & Breach Calculator (Static & Trailing)"
+  description="See your exact breach prices: remaining daily loss room, max drawdown floor, and trailing drawdown levels — the numbers that end funded accounts."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="dd-start">Starting account size ($)</label>
+        <input type="number" id="dd-start" value="100000" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="dd-sod">Start-of-day balance ($)</label>
+        <input type="number" id="dd-sod" value="100000" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="dd-equity">Current equity ($)</label>
+        <input type="number" id="dd-equity" value="100000" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="dd-daily">Daily loss limit (%)</label>
+        <input type="number" id="dd-daily" value="5" step="0.5" min="0.5" />
+      </div>
+      <div class="tool-field">
+        <label for="dd-max">Max drawdown (%)</label>
+        <input type="number" id="dd-max" value="10" step="0.5" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="dd-type">Max drawdown type</label>
+        <select id="dd-type">
+          <option value="static" selected>Static (from starting balance)</option>
+          <option value="trailing">Trailing (from equity peak)</option>
+        </select>
+      </div>
+      <div class="tool-field" id="dd-peak-wrap" style="display:none">
+        <label for="dd-peak">Highest equity reached ($)</label>
+        <input type="number" id="dd-peak" value="100000" min="0" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="dd-calc">Calculate breach levels</button>
+    </div>
+    <div class="tool-results" id="dd-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Daily breach level (equity)</div>
+          <div class="value" id="dd-dailylevel">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Room left today</div>
+          <div class="value" id="dd-dailyroom">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Max drawdown floor</div>
+          <div class="value" id="dd-maxlevel">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Room to max breach</div>
+          <div class="value" id="dd-maxroom">—</div>
+        </div>
+      </div>
+      <p id="dd-comment" style="margin-top:1rem; font-weight:600"></p>
+      <p class="tool-note">
+        Daily limit computed from start-of-day balance. Some firms use start-of-day equity or
+        prior-day close — check your dashboard's exact formula. Floating P&amp;L counts at nearly
+        all firms.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>The two numbers that end accounts</h2>
+    <p>
+      Every breached account died at one of the two levels this calculator shows: the daily loss
+      line or the max drawdown floor. Traders breach not because the rules are hidden but because
+      they track percentages in their head while the firm tracks exact equity levels. Write both
+      breach prices on a sticky note before your first trade of the day.
+    </p>
+    <p>
+      If you selected <strong>trailing</strong> mode, notice how your floor follows your best
+      equity, not your balance — after a strong run, breakeven can become a breach. The full
+      mechanics (static vs trailing, balance vs equity, EOD vs intraday) are in
+      <a href="/guides/prop-firm-drawdown-explained/">drawdown rules explained</a>, and you can
+      size positions so a normal losing streak never reaches these levels with the
+      <a href="/tools/position-size-calculator/">position size calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+    ($('dd-type') as unknown as HTMLSelectElement).addEventListener('change', () => {
+      const trailing = ($('dd-type') as unknown as HTMLSelectElement).value === 'trailing';
+      document.getElementById('dd-peak-wrap')!.style.display = trailing ? '' : 'none';
+    });
+
+    document.getElementById('dd-calc')!.addEventListener('click', () => {
+      const start = parseFloat($('dd-start').value) || 0;
+      const sod = parseFloat($('dd-sod').value) || start;
+      const equity = parseFloat($('dd-equity').value) || start;
+      const dailyPct = (parseFloat($('dd-daily').value) || 5) / 100;
+      const maxPct = (parseFloat($('dd-max').value) || 10) / 100;
+      const trailing = ($('dd-type') as unknown as HTMLSelectElement).value === 'trailing';
+      const peak = Math.max(parseFloat($('dd-peak').value) || start, equity, start);
+
+      if (start <= 0) return;
+
+      const dailyLevel = sod * (1 - dailyPct);
+      const dailyRoom = equity - dailyLevel;
+      const maxLevel = trailing ? peak - start * maxPct : start * (1 - maxPct);
+      const maxRoom = equity - maxLevel;
+
+      document.getElementById('dd-dailylevel')!.textContent = usd(dailyLevel);
+      document.getElementById('dd-dailyroom')!.textContent = usd(Math.max(0, dailyRoom));
+      document.getElementById('dd-maxlevel')!.textContent = usd(maxLevel);
+      document.getElementById('dd-maxroom')!.textContent = usd(Math.max(0, maxRoom));
+
+      const binding = Math.min(dailyRoom, maxRoom);
+      const bindingPct = (binding / equity) * 100;
+      const comment = document.getElementById('dd-comment')!;
+      if (dailyRoom <= 0 || maxRoom <= 0) {
+        comment.textContent = '⚠ You are at or past a breach level.';
+      } else {
+        comment.textContent =
+          'Binding constraint: ' +
+          (dailyRoom < maxRoom ? 'daily limit' : 'max drawdown') +
+          ' — ' + usd(binding) + ' (' + bindingPct.toFixed(1) + '% of equity). ' +
+          (bindingPct < 2
+            ? 'Consider stopping: this is inside one normal trade’s range.'
+            : 'A personal stop at half this distance keeps you unbreacheable.');
+      }
+
+      document.getElementById('dd-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

@@ -1,0 +1,155 @@
+---
+import Tool from '../../layouts/Tool.astro';
+
+const faqs = [
+  {
+    q: 'How do I calculate lot size for a prop firm challenge?',
+    a: 'Lot size = (account size × risk %) ÷ (stop loss in pips × pip value per lot). Example: $100,000 account, 1% risk ($1,000), 25-pip stop on EURUSD ($10/pip per standard lot) → $1,000 ÷ (25 × $10) = 4.0 lots. Most prop traders should risk 0.5–1% per trade.',
+  },
+  {
+    q: 'What risk percentage should I use in a prop firm challenge?',
+    a: 'Risk 0.5–1% per trade. At 1% you need 5 same-day losers to breach a 5% daily limit and 10 consecutive losers to breach a 10% max drawdown — comfortable survival margins. Note that FTMO now enforces a 0.5–1% per-trade cap on funded accounts, so practicing at that level also future-proofs your habits.',
+  },
+  {
+    q: 'What is the pip value for gold (XAUUSD)?',
+    a: 'At most prop firm brokers, 1 standard lot of XAUUSD (100 oz) has a value of about $10 per 0.10 price move (commonly quoted as $1 per pip where a pip is $0.01, or $10 per "big pip" of $0.10). This calculator uses $10 per $0.10 move — enter your stop in $0.10 increments.',
+  },
+  {
+    q: 'Does position size change between challenge and funded accounts?',
+    a: 'The formula is identical, but many traders cut risk to half size (e.g. 0.5%) right after getting funded and right before reaching a payout — the two points where a breach costs you the most. Some firms also add explicit per-trade risk caps on funded accounts.',
+  },
+];
+---
+
+<Tool
+  title="Position Size Calculator for Prop Firm Traders"
+  metaTitle="Prop Firm Position Size Calculator (Forex, Gold, Indices)"
+  description="Calculate the exact lot size for your risk per trade — built for prop firm rules with presets for forex pairs, XAUUSD and indices, plus a daily-loss survival check."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="ps-account">Account size ($)</label>
+        <input type="number" id="ps-account" value="100000" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="ps-risk">Risk per trade (%)</label>
+        <input type="number" id="ps-risk" value="1" step="0.1" min="0.01" max="100" />
+      </div>
+      <div class="tool-field">
+        <label for="ps-stop">Stop loss (pips / points)</label>
+        <input type="number" id="ps-stop" value="25" step="0.1" min="0.1" />
+      </div>
+      <div class="tool-field">
+        <label for="ps-instrument">Instrument</label>
+        <select id="ps-instrument">
+          <option value="10" selected>EURUSD / GBPUSD / AUDUSD ($10/pip)</option>
+          <option value="6.7">USDJPY (~$6.7/pip)</option>
+          <option value="10">XAUUSD gold ($10 per $0.10 move)</option>
+          <option value="1">US indices — $1/point mini contract</option>
+          <option value="custom">Custom pip value</option>
+        </select>
+      </div>
+      <div class="tool-field" id="ps-custom-wrap" style="display:none">
+        <label for="ps-custom">Pip value per standard lot ($)</label>
+        <input type="number" id="ps-custom" value="10" step="0.1" min="0.01" />
+      </div>
+      <div class="tool-field">
+        <label for="ps-daily">Firm daily loss limit (%)</label>
+        <input type="number" id="ps-daily" value="5" step="0.5" min="0.5" max="100" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="ps-calc">Calculate position size</button>
+    </div>
+    <div class="tool-results" id="ps-results">
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="label">Lot size</div>
+          <div class="value" id="ps-lots">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Risk per trade</div>
+          <div class="value" id="ps-riskusd">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Losses to daily breach</div>
+          <div class="value" id="ps-losses">—</div>
+        </div>
+        <div class="result-stat" id="ps-verdict-box">
+          <div class="label">Sizing verdict</div>
+          <div class="value" id="ps-verdict" style="font-size:1.05rem">—</div>
+        </div>
+      </div>
+      <p class="tool-note">
+        Verify your broker's contract specs — pip values vary slightly between prop firm platforms.
+        This tool assumes USD-denominated accounts.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Why sizing is the whole game in a prop firm challenge</h2>
+    <p>
+      Oversizing is the #1 cause of failed evaluations. A challenge with a 5% daily loss limit
+      doesn't test your strategy — it tests whether an ordinary losing streak fits inside the
+      rules. At 1% risk you can absorb five same-day losers; at 3% risk, two bad trades end your
+      day and four end the account. The math and the week-by-week plan are in our guide to
+      <a href="/guides/how-to-pass-a-prop-firm-challenge/">passing a prop firm challenge</a>.
+    </p>
+    <h2>How this calculator works</h2>
+    <p>
+      Lot size = (account × risk%) ÷ (stop distance × pip value per lot). The "losses to daily
+      breach" figure divides your firm's daily limit by your per-trade risk — keep it at 5 or
+      higher. If your firm uses a tighter daily limit (e.g.
+      <a href="/reviews/fundingpips-review/">FundingPips at 3%</a>), the calculator flags when your
+      sizing leaves fewer than three losers of headroom. Check your remaining breach room live with
+      the <a href="/tools/drawdown-calculator/">drawdown calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+
+    $('ps-instrument').addEventListener('change', () => {
+      const custom = ($('ps-instrument') as unknown as HTMLSelectElement).value === 'custom';
+      document.getElementById('ps-custom-wrap')!.style.display = custom ? '' : 'none';
+    });
+
+    document.getElementById('ps-calc')!.addEventListener('click', () => {
+      const account = parseFloat($('ps-account').value) || 0;
+      const riskPct = parseFloat($('ps-risk').value) || 0;
+      const stop = parseFloat($('ps-stop').value) || 0;
+      const sel = ($('ps-instrument') as unknown as HTMLSelectElement).value;
+      const pipValue = sel === 'custom' ? parseFloat($('ps-custom').value) || 10 : parseFloat(sel);
+      const daily = parseFloat($('ps-daily').value) || 5;
+
+      if (account <= 0 || riskPct <= 0 || stop <= 0 || pipValue <= 0) return;
+
+      const riskUsd = (account * riskPct) / 100;
+      const lots = riskUsd / (stop * pipValue);
+      const losses = daily / riskPct;
+
+      document.getElementById('ps-lots')!.textContent = lots.toFixed(2);
+      document.getElementById('ps-riskusd')!.textContent =
+        '$' + riskUsd.toLocaleString(undefined, { maximumFractionDigits: 0 });
+      document.getElementById('ps-losses')!.textContent = losses.toFixed(1);
+
+      const verdictEl = document.getElementById('ps-verdict')!;
+      const box = document.getElementById('ps-verdict-box')!;
+      if (losses >= 5) {
+        verdictEl.textContent = 'Safe: survives a normal losing streak';
+        box.classList.remove('warn');
+      } else if (losses >= 3) {
+        verdictEl.textContent = 'Aggressive: a bad morning threatens your daily limit';
+        box.classList.add('warn');
+      } else {
+        verdictEl.textContent = 'Danger: ' + Math.ceil(losses) + ' losers breach your daily limit';
+        box.classList.add('warn');
+      }
+
+      document.getElementById('ps-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { CATEGORIES } from '../consts';
+
+interface Props {
+  entry: CollectionEntry<'articles'>;
+}
+
+const { entry } = Astro.props;
+const { title, description, category, pubDate, updatedDate } = entry.data;
+const date = updatedDate ?? pubDate;
+---
+
+<li class="card">
+  <span class="cat">{CATEGORIES[category].title}</span>
+  <h3><a href={`/${category}/${entry.id}/`}>{title}</a></h3>
+  <p>{description}</p>
+  <time datetime={date.toISOString()}>
+    {date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+  </time>
+</li>

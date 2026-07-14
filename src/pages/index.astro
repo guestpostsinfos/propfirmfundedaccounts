@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { SITE } from '../consts';
+
+const articles = (await getCollection('articles', ({ data }) => !data.draft)).sort(
+  (a, b) =>
+    (b.data.updatedDate ?? b.data.pubDate).valueOf() -
+    (a.data.updatedDate ?? a.data.pubDate).valueOf()
+);
+
+const reviews = articles.filter((a) => a.data.category === 'reviews').slice(0, 3);
+const guides = articles.filter((a) => a.data.category === 'guides').slice(0, 3);
+const latest = articles.slice(0, 6);
+---
+
+<Base
+  title={`${SITE.name} — Reviews, Payouts & Free Tools`}
+  description={SITE.description}
+>
+  <section class="hero">
+    <div class="wrap">
+      <span class="badge">Updated monthly · Data from purchased evaluations</span>
+      <h1>Prop firm reviews traders can actually verify</h1>
+      <p class="lede">
+        We buy the challenges, document the payouts, and track every rule change — so you know
+        which prop firms fund traders and which ones fail them. No hype, no recycled marketing
+        copy.
+      </p>
+      <p>
+        <a class="btn" href="/best/best-prop-firms/">See the best prop firms of 2026</a>
+        &nbsp;
+        <a class="btn ghost" href="/methodology/">How we test firms</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Latest research</h2>
+    <ul class="card-grid">
+      {latest.map((a) => <ArticleCard entry={a} />)}
+    </ul>
+  </section>
+
+  <section class="wrap">
+    <h2>Free prop trading tools</h2>
+    <ul class="card-grid">
+      <li class="card">
+        <span class="cat">Calculator</span>
+        <h3><a href="/tools/challenge-pass-simulator/">Challenge Pass Simulator</a></h3>
+        <p>Monte Carlo your real odds of passing — 20,000 simulated challenges from your win rate and sizing, before you pay a fee.</p>
+      </li>
+      <li class="card">
+        <span class="cat">Calculator</span>
+        <h3><a href="/tools/position-size-calculator/">Position Size Calculator</a></h3>
+        <p>Exact lot size for your risk and stop — with a daily-loss survival check built for prop firm rules.</p>
+      </li>
+      <li class="card">
+        <span class="cat">Calculator</span>
+        <h3><a href="/tools/drawdown-calculator/">Drawdown & Breach Calculator</a></h3>
+        <p>Your exact breach prices for daily and max drawdown — static and trailing modes.</p>
+      </li>
+    </ul>
+    <p><a href="/tools/">All five tools →</a></p>
+  </section>
+
+  <section class="wrap">
+    <h2>Hands-on firm reviews</h2>
+    <ul class="card-grid">
+      {reviews.map((a) => <ArticleCard entry={a} />)}
+    </ul>
+    <p><a href="/reviews/">All reviews →</a></p>
+  </section>
+
+  <section class="wrap">
+    <h2>Learn prop trading</h2>
+    <ul class="card-grid">
+      {guides.map((a) => <ArticleCard entry={a} />)}
+    </ul>
+    <p><a href="/guides/">All guides →</a></p>
+  </section>
+</Base>

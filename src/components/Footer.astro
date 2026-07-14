@@ -1,0 +1,52 @@
+---
+import { SITE } from '../consts';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cols">
+      <div>
+        <h4>{SITE.name}</h4>
+        <ul>
+          <li><a href="/about/">About us</a></li>
+          <li><a href="/methodology/">Review methodology</a></li>
+          <li><a href="/news/">Rule-change tracker</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Popular</h4>
+        <ul>
+          <li><a href="/best/best-prop-firms/">Best prop firms 2026</a></li>
+          <li><a href="/reviews/ftmo-review/">FTMO review</a></li>
+          <li><a href="/compare/ftmo-vs-fundednext/">FTMO vs FundedNext</a></li>
+          <li><a href="/guides/how-to-pass-a-prop-firm-challenge/">How to pass a challenge</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Learn</h4>
+        <ul>
+          <li><a href="/guides/what-is-a-prop-firm/">What is a prop firm?</a></li>
+          <li><a href="/guides/prop-firm-drawdown-explained/">Drawdown rules explained</a></li>
+          <li><a href="/guides/are-prop-firms-legit/">Are prop firms legit?</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Free tools</h4>
+        <ul>
+          <li><a href="/tools/position-size-calculator/">Position size calculator</a></li>
+          <li><a href="/tools/challenge-pass-simulator/">Challenge pass simulator</a></li>
+          <li><a href="/tools/drawdown-calculator/">Drawdown calculator</a></li>
+          <li><a href="/tools/">All tools</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="disclaimer">
+      <strong>Risk disclaimer:</strong> Trading involves substantial risk of loss. Prop firm
+      evaluations are fee-based simulated trading programs, not investment services. Nothing on
+      {SITE.name} is financial advice. Some links may be affiliate links; they never influence our
+      ratings — see our <a href="/methodology/">methodology</a>. &copy; {year} {SITE.name}.
+    </p>
+  </div>
+</footer>

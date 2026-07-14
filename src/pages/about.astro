@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { AUTHOR, SITE } from '../consts';
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: `About ${SITE.name}`,
+    url: `${SITE.url}/about/`,
+    isPartOf: { '@id': `${SITE.url}/#website` },
+  },
+];
+---
+
+<Base
+  title={`About ${SITE.name} — who we are and why we exist`}
+  description={`${SITE.name} is an independent prop firm research site. We buy evaluations, document payouts and track rule changes across the funded trading industry.`}
+  schema={schema}
+>
+  <div class="wrap">
+    <header class="hub-head">
+      <h1>About {SITE.name}</h1>
+    </header>
+    <article class="article-body">
+      <p>
+        {SITE.name} exists because the prop firm industry has a trust problem. Between 2024 and
+        2026, more than 80 prop firms shut down — many owing traders unpaid profits. Most "review"
+        sites in this niche republish firm marketing copy in exchange for affiliate commissions and
+        never mention the risks.
+      </p>
+      <p>We work differently:</p>
+      <ul>
+        <li><strong>We buy every challenge we review.</strong> Ratings are based on purchased evaluations, not press kits.</li>
+        <li><strong>We document payouts.</strong> A firm only earns a payout-reliability score after we (or verified community members) have requested and received real withdrawals.</li>
+        <li><strong>We track rule changes monthly.</strong> Prop firm rules change constantly; every review shows its last-verified date.</li>
+        <li><strong>Affiliate links never affect rankings.</strong> Our <a href="/methodology/">methodology</a> is public, and firms cannot pay for placement.</li>
+      </ul>
+      <h2>Who writes {SITE.name}?</h2>
+      <p>{AUTHOR.bio}</p>
+      <p>
+        Questions, corrections or payout-dispute reports: reach us via the
+        <a href="/contact/">contact page</a>. Corrections are published with a changelog on the
+        affected article.
+      </p>
+    </article>
+  </div>
+</Base>

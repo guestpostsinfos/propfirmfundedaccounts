@@ -1,0 +1,131 @@
+---
+import Tool from '../../layouts/Tool.astro';
+
+const faqs = [
+  {
+    q: 'How do prop firm profit splits work?',
+    a: 'You keep a fixed percentage of profits generated on your funded account — typically 80–95% at forex firms in 2026, with futures firms often paying 100% of an initial band ($10K at Topstep, $25K at Apex) before switching to 90/10. Splits usually improve through scaling plans after consistent payouts.',
+  },
+  {
+    q: 'What is a good profit split in 2026?',
+    a: 'The 2026 market standard is 80% minimum (FTMO base) with the value leaders at 90–95% (FundedNext) and futures firms at effectively 100% early on. Below 80% on a standard evaluation account is uncompetitive unless the firm compensates with instant funding or unusually generous rules.',
+  },
+  {
+    q: 'How is a 5% monthly gain on a funded account paid out?',
+    a: 'A 5% month on a $100,000 account is $5,000 gross; at an 85% split you receive $4,250, and on your first payout a refundable-fee firm also returns your challenge fee. That single realistic month typically returns 5–8x a challenge fee — the entire economic case for prop trading.',
+  },
+  {
+    q: 'Do you pay taxes on prop firm payouts?',
+    a: 'In most jurisdictions payouts are taxable self-employment/contractor income (firms typically pay you as an independent contractor, not an employee), and no tax is withheld — you must set money aside. Rules vary widely by country; consult a professional before your first sizable payout.',
+  },
+];
+---
+
+<Tool
+  title="Prop Firm Profit Split & Payout Calculator"
+  metaTitle="Prop Firm Profit Split & Payout Calculator (Take-Home)"
+  description="Calculate your actual payout: profit split tiers, 100%-first-band futures deals, fee refunds and your effective return on the challenge fee."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="sp-profit">Profit this payout cycle ($)</label>
+        <input type="number" id="sp-profit" value="5000" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-split">Profit split (your %)</label>
+        <input type="number" id="sp-split" value="80" min="1" max="100" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-band">100%-band remaining ($, futures deals)</label>
+        <input type="number" id="sp-band" value="0" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-fee">Challenge fee paid ($)</label>
+        <input type="number" id="sp-fee" value="619" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-refund">Fee refunded this payout?</label>
+        <select id="sp-refund">
+          <option value="yes">Yes (first payout, FTMO-style)</option>
+          <option value="no" selected>No</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="sp-calc">Calculate my payout</button>
+    </div>
+    <div class="tool-results" id="sp-results">
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="label">Your take-home</div>
+          <div class="value" id="sp-take">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Firm keeps</div>
+          <div class="value" id="sp-firm">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Return on challenge fee</div>
+          <div class="value" id="sp-roi">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Effective split this cycle</div>
+          <div class="value" id="sp-eff">—</div>
+        </div>
+      </div>
+      <p class="tool-note">
+        Remember: payouts are usually untaxed contractor income — set aside your jurisdiction's
+        rate before spending. And withdraw every cycle; unwithdrawn balances are unsecured credit
+        to an unregulated firm.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Reading split offers like an analyst</h2>
+    <p>
+      Splits are the most-marketed and least-decisive number in prop trading. The difference
+      between 80% and 90% on a $5,000 month is $500 — real money, but smaller than the difference
+      between a firm that pays in 2 days and one that stalls payouts for weeks
+      (<a href="/guides/are-prop-firms-legit/">the 2024–2026 shutdowns</a> made that vivid).
+      Rank payout reliability first, split second — that's how our
+      <a href="/best/best-prop-firms/">firm rankings</a> weight it.
+    </p>
+    <p>
+      The "100%-band remaining" field models futures deals like
+      <a href="/reviews/topstep-review/">Topstep's 100% of your first $10K</a> or Apex's first
+      $25K: that portion of your profit bypasses the split entirely. For the full journey math —
+      what funding actually returns on your evaluation spend — combine this with the
+      <a href="/tools/challenge-cost-calculator/">true cost calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+    document.getElementById('sp-calc')!.addEventListener('click', () => {
+      const profit = parseFloat($('sp-profit').value) || 0;
+      const split = (parseFloat($('sp-split').value) || 80) / 100;
+      const band = Math.max(0, parseFloat($('sp-band').value) || 0);
+      const fee = parseFloat($('sp-fee').value) || 0;
+      const refund = ($('sp-refund') as unknown as HTMLSelectElement).value === 'yes';
+
+      const fullShare = Math.min(profit, band);
+      const splitShare = Math.max(0, profit - fullShare);
+      const take = fullShare + splitShare * split + (refund ? fee : 0);
+      const firm = splitShare * (1 - split);
+      const roi = fee > 0 ? (take / fee) * 100 : 0;
+      const eff = profit > 0 ? ((fullShare + splitShare * split) / profit) * 100 : 0;
+
+      document.getElementById('sp-take')!.textContent = usd(take);
+      document.getElementById('sp-firm')!.textContent = usd(firm);
+      document.getElementById('sp-roi')!.textContent = fee > 0 ? roi.toFixed(0) + '%' : '—';
+      document.getElementById('sp-eff')!.textContent = profit > 0 ? eff.toFixed(1) + '%' : '—';
+
+      document.getElementById('sp-results')!.classList.add('show');
+    });
+  </script>
+</Tool>
