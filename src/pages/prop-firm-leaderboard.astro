@@ -1,6 +1,6 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { SITE } from '../../consts';
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
 import {
   leaderboard,
   topMovers,
@@ -9,9 +9,9 @@ import {
   weekLabel,
   UPDATED,
   FIRMS,
-} from '../../data/trustpilot.mjs';
+} from '../data/trustpilot.mjs';
 
-const url = `${SITE.url}/trustpilot-reviews/`;
+const url = `${SITE.url}/prop-firm-leaderboard/`;
 const board = leaderboard();
 const movers = topMovers();
 const summary = marketSummary();
@@ -23,22 +23,33 @@ const signed = (n) => (n > 0 ? `+${n}` : `${n}`);
 
 const trendLabel = { up: 'Rising', down: 'Falling', steady: 'Steady', new: 'New' };
 
+const top = board[0];
 const faqs = [
   {
-    q: 'How often is this prop firm Trustpilot tracker updated?',
-    a: 'Every week. We record each firm’s Trustpilot TrustScore and total review count, then compare it to the previous week so you can see which prop firms are climbing and which are slipping. The date at the top of the page shows the latest snapshot.',
+    q: 'What is a prop firm leaderboard?',
+    a: 'A prop firm leaderboard ranks proprietary trading firms against each other so you can see, at a glance, which firms are performing best right now. This one ranks every major prop firm by its live Trustpilot rating and updates every week, showing which firms are rising and which are falling.',
   },
   {
-    q: 'How are the prop firms ranked?',
-    a: 'By current Trustpilot TrustScore, highest first, with total review volume as the tie-breaker — a 4.8 from 40,000 reviews is more meaningful than a 4.8 from 400. A firm whose score rose since last week moves up and is flagged as rising; a firm whose score fell moves down and is flagged as falling.',
+    q: 'Which prop firm is ranked number 1 right now?',
+    a: top
+      ? `As of the week of ${weekOf}, ${top.name} tops the leaderboard with a Trustpilot TrustScore of ${top.score.toFixed(1)}/5 from ${top.reviews != null ? top.reviews.toLocaleString('en-US') : 'thousands of'} reviews. The ranking is recalculated every week, so the #1 firm can change — check the table above for the current order.`
+      : 'The table above shows the current #1 firm; the ranking is recalculated every week.',
   },
   {
-    q: 'Are these the real Trustpilot ratings?',
+    q: 'How are prop firms ranked on this leaderboard?',
+    a: 'By current Trustpilot TrustScore, highest first, with total review volume as the tie-breaker — a 4.8 from 40,000 reviews is more meaningful than a 4.8 from 400. A firm whose rating rose since last week moves up and is flagged as rising; a firm whose rating fell moves down and is flagged as falling.',
+  },
+  {
+    q: 'How often is the prop firm leaderboard updated?',
+    a: 'Every week. We record each firm’s Trustpilot TrustScore and total review count, then compare it to the previous reading so you can see which prop firms are climbing and which are slipping. The date at the top of the page shows the latest snapshot.',
+  },
+  {
+    q: 'Are these the real prop firm ratings?',
     a: 'Yes. The TrustScores and review counts are the real, publicly reported figures for each firm’s verified Trustpilot page, cross-checked across sources. Each firm page links directly to its live Trustpilot profile so you can read the underlying reviews yourself.',
   },
   {
-    q: 'Does a high Trustpilot score mean a prop firm is safe?',
-    a: 'Not on its own. Trustpilot reflects customer sentiment, which is useful but gameable — firms can incentivise reviews, and a wave of positive reviews can mask a recent rule or payout change. Read the score alongside our hands-on reviews, which weight documented payout reliability and rule fairness above sentiment.',
+    q: 'Is the highest-ranked prop firm the best one for me?',
+    a: 'Not necessarily. This leaderboard ranks firms on customer sentiment, which is useful but gameable — a wave of positive reviews can mask a recent rule or payout change. For the best firm for your strategy, read this alongside our hands-on best prop firms ranking and reviews, which weight documented payout reliability and rule fairness above sentiment.',
   },
 ];
 
@@ -47,9 +58,9 @@ const schema = [
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     '@id': `${url}#webpage`,
-    name: 'Prop Firm Trustpilot Reviews & Ratings Tracker',
+    name: 'Prop Firm Leaderboard — Weekly Live Rankings & Performance',
     description:
-      'A weekly-updated tracker of every major prop firm’s Trustpilot rating and review count, ranked by score with week-over-week risers and fallers.',
+      'A live, weekly-updated prop firm leaderboard ranking every major proprietary trading firm by real Trustpilot rating and performance, with this week’s biggest risers and fallers.',
     url,
     isPartOf: { '@id': `${SITE.url}/#website` },
     dateModified: UPDATED,
@@ -57,13 +68,13 @@ const schema = [
   {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Prop firms ranked by Trustpilot rating',
+    name: 'Prop firm leaderboard — firms ranked by rating',
     itemListOrder: 'https://schema.org/ItemListOrderDescending',
     numberOfItems: board.length,
     itemListElement: board.map((r, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      name: `${r.name} Trustpilot Reviews & Rating`,
+      name: `${r.name} — ${r.score != null ? r.score.toFixed(1) + '/5' : 'rated'}`,
       url: `${SITE.url}/trustpilot-reviews/${r.slug}/`,
     })),
   },
@@ -72,7 +83,7 @@ const schema = [
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE.url}/` },
-      { '@type': 'ListItem', position: 2, name: 'Trustpilot Reviews Tracker', item: url },
+      { '@type': 'ListItem', position: 2, name: 'Prop Firm Leaderboard', item: url },
     ],
   },
   {
@@ -88,32 +99,35 @@ const schema = [
 ---
 
 <Base
-  title="Prop Firm Trustpilot Reviews & Ratings — Weekly Tracker"
-  description="Every major prop firm's Trustpilot rating and review count, ranked and updated weekly. See which prop firms are rising and which are falling this week."
+  title="Prop Firm Leaderboard Weekly – Live Rankings & Performance"
+  description="The weekly prop firm leaderboard: every major prop trading firm ranked live by real Trustpilot rating and performance, with the biggest risers and fallers."
   schema={schema}
 >
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb">
       <ol>
         <li><a href="/">Home</a></li>
-        <li aria-current="page">Trustpilot Reviews Tracker</li>
+        <li aria-current="page">Prop Firm Leaderboard</li>
       </ol>
     </nav>
   </div>
 
   <header class="tp-hero">
     <div class="wrap">
-      <span class="badge">Updated weekly · Real Trustpilot data</span>
-      <h1>Prop Firm Trustpilot Reviews &amp; Ratings Tracker</h1>
+      <span class="badge">Live weekly leaderboard · Real Trustpilot data</span>
+      <h1>Prop Firm Leaderboard — Weekly Live Rankings &amp; Performance</h1>
       <p class="lede">
-        The live Trustpilot standings for every major prop firm — ranked by TrustScore and
-        refreshed every week. We log each firm's rating and review count, then compare it to last
-        week so you can see, at a glance, <strong>which prop firms are climbing and which are
-        slipping</strong>. Ratings are the real, publicly reported figures; each firm links to its
-        live Trustpilot page and our own hands-on review.
+        The live <strong>prop firm leaderboard</strong>: every major proprietary trading firm
+        ranked head-to-head by its real Trustpilot rating and performance, refreshed every week. See
+        the current <strong>prop firm rankings</strong> at a glance —
+        <strong>which firms are climbing and which are slipping</strong> — with this week's biggest
+        risers and fallers. Ratings are the real, publicly reported figures; each firm links to its
+        live Trustpilot page and full review. Looking for our hand-tested editorial pick instead?
+        See the <a href="/best/best-prop-firms/">best prop firms</a> ranking.
       </p>
       <p class="tp-week">
-        This week's snapshot: <strong>Week of {weekOf}</strong> · {summary.count} firms tracked
+        This week's leaderboard: <strong>Week of {weekOf}</strong> · {summary.count} prop firms
+        ranked{top ? <> · #1 <strong>{top.name}</strong> ({top.score.toFixed(1)}/5)</> : null}
       </p>
     </div>
   </header>
@@ -167,12 +181,12 @@ const schema = [
     )}
 
     <!-- ===== LEADERBOARD ===== -->
-    <section aria-label="Prop firms ranked by Trustpilot rating">
-      <h2>This week's Trustpilot ranking</h2>
+    <section aria-label="Prop firm leaderboard — firms ranked by rating">
+      <h2>This week's prop firm leaderboard</h2>
       <p class="tp-note">
-        Ranked by current TrustScore (review volume breaks ties). The arrow shows the change versus
-        the previous reading — firms whose rating rose climb the table, firms whose rating fell drop
-        down.
+        The full prop firm rankings, ordered by current TrustScore (review volume breaks ties). The
+        arrow shows the change versus the previous reading — firms whose rating rose climb the
+        leaderboard, firms whose rating fell drop down.
       </p>
       <div class="tp-table-wrap">
         <table class="tp-table">
@@ -254,15 +268,18 @@ const schema = [
     </section>
 
     <!-- ===== HOW IT WORKS ===== -->
-    <section class="tp-explainer" aria-label="How the tracker works">
-      <h2>How we track prop firm Trustpilot ratings</h2>
+    <section class="tp-explainer" aria-label="How the prop firm leaderboard works">
+      <h2>How the prop firm leaderboard works</h2>
       <p>
-        Once a week we record each firm's Trustpilot <strong>TrustScore</strong> (the 1–5 rating)
-        and its <strong>total review count</strong> from its verified Trustpilot page, and store the
-        snapshot. Each week we take a fresh reading and compare TrustScores: a firm whose rating
-        <em>rose</em> climbs the ranking, a firm whose rating <em>fell</em> drops down. Review count
-        is shown as a credibility signal — a 4.8 from 40,000 reviews carries more weight than a 4.8
-        from a few hundred.
+        The leaderboard ranks the biggest forex and futures prop firms —
+        <strong>FTMO, FundedNext, FundingPips, The5ers, Topstep, Apex, MyFundedFutures, Take Profit
+        Trader, E8 Markets and Alpha Capital Group</strong>. Once a week we record each firm's
+        Trustpilot <strong>TrustScore</strong> (the 1–5 rating) and its <strong>total review
+        count</strong> from its verified Trustpilot page, and store the snapshot. Each week we take a
+        fresh reading and compare TrustScores: a firm whose rating <em>rose</em> climbs the
+        leaderboard, a firm whose rating <em>fell</em> drops down. Review count is shown as a
+        credibility signal — a 4.8 from 40,000 reviews carries more weight than a 4.8 from a few
+        hundred.
       </p>
       <p class="tp-baseline">
         This is the tracker's first published week, so the change column compares each firm's current
@@ -289,7 +306,7 @@ const schema = [
 
     <!-- ===== FAQ ===== -->
     <section class="faq" aria-label="Frequently asked questions">
-      <h2>Trustpilot tracker — FAQ</h2>
+      <h2>Prop firm leaderboard — FAQ</h2>
       {faqs.map((f) => (
         <details>
           <summary>{f.q}</summary>

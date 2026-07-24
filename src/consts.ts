@@ -25,7 +25,7 @@ export const NAV = [
   { label: 'Learn', href: '/learn/' },
   { label: 'Best Prop Firms', href: '/best/best-prop-firms/' },
   { label: 'Reviews', href: '/reviews/' },
-  { label: 'Trustpilot Tracker', href: '/trustpilot-reviews/' },
+  { label: 'Leaderboard', href: '/prop-firm-leaderboard/' },
   { label: 'Comparisons', href: '/compare/' },
   { label: 'Guides', href: '/guides/' },
   { label: 'Tools', href: '/tools/' },
