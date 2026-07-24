@@ -6,7 +6,7 @@ export const SITE = {
   url: 'https://propfirmfundedaccounts.com',
   tagline: 'Independent prop firm reviews, comparisons and payout research',
   description:
-    'Prop Firm Funded Accounts publishes independent, hands-on research on proprietary trading firms: challenge rules, real costs, payout reliability and side-by-side comparisons — updated monthly.',
+    'Independent, hands-on prop firm research: challenge rules, real costs, payout reliability and side-by-side comparisons of the top proprietary trading firms.',
   locale: 'en_US',
   twitter: '@propfirmfunded',
 } as const;
