@@ -52,6 +52,6 @@ Match the rule to your equity curve, honestly:
 
 - **Steady intraday grinders** (many small green days): the rule never touches you — buy on other criteria from the [rankings](/best/best-prop-firms/).
 - **News/event traders and trend-capture swing traders** (profit concentrated in bursts): a 30–40% cap structurally conflicts with your edge. Choose FTMO/FundedNext-style structures, or accept longer dilution periods as a cost of business.
-- **Not sure which you are?** Your journal knows: compute best-day share over your last 30 sessions. Above 40%? You're streaky — and the [pass simulator](/tools/challenge-pass-simulator/) at low trades-per-day will show you how that interacts with targets.
+- **Not sure which you are?** Your journal knows: compute best-day share over your last 30 sessions with the [consistency rule calculator](/tools/consistency-rule-calculator/). Above 40%? You're streaky — and the [pass simulator](/tools/challenge-pass-simulator/) at low trades-per-day will show you how that interacts with targets.
 
 One more honest note: consistency rules are also a solvency signal — they're how careful firms keep payout distributions fundable. A firm with *no* risk filters and aggressive discounts is running [collapse-pattern economics](/guides/are-prop-firms-legit/). The rule you resent may be part of why your payout arrives.

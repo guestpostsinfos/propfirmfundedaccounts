@@ -57,7 +57,7 @@ FundingPips grew fast on aggressive pricing and flexible models (1-step, 2-step 
 
 ## 4. The5ers — best for slow, consistent equity curves
 
-The5ers rewards exactly the behavior most firms' rules punish: low-risk, consistent trading. Its bootcamp-style programs cost less upfront, and scaling can reach a 100% profit split. Growth is slower by design — this is the firm for traders who think in months, not days.
+The5ers rewards exactly the behavior most firms' rules punish: low-risk, consistent trading. Its bootcamp-style programs cost less upfront, and scaling can reach a 100% profit split. Growth is slower by design — this is the firm for traders who think in months, not days. If long-term account growth is your priority, see how the milestones work across firms in our [scaling plans guide](/guides/prop-firm-scaling-plans-explained/).
 
 ## 5. Topstep — best futures prop firm
 

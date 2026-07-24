@@ -1,0 +1,150 @@
+---
+import Tool from '../../layouts/Tool.astro';
+
+const faqs = [
+  {
+    q: 'How do I calculate my consistency percentage?',
+    a: 'Divide your best single day\'s profit by your total profit in the window, then multiply by 100. If a $3,000 best day sits inside $8,000 total profit, that is 37.5%. If your firm\'s cap is 40%, you comply; if it is 30%, you do not and the payout is deferred until more trading dilutes the ratio.',
+  },
+  {
+    q: 'What total profit do I need to satisfy a consistency rule?',
+    a: 'The formula is best day ÷ cap. A $3,000 best day under a 50% rule needs $6,000 total; under a 40% rule it needs $7,500; under 30% it needs $10,000. This calculator shows the exact figure and how much additional profit you still need to book.',
+  },
+  {
+    q: 'Does breaking a consistency rule fail my account?',
+    a: 'At most firms, no. The payout is deferred, not the account closed — you keep trading normal size until your best day falls below the cap. The real danger is forcing trades to close the gap and breaching a daily drawdown instead. A minority of firms treat repeat violations more harshly, so read your specific terms.',
+  },
+  {
+    q: 'Which prop firms have the strictest consistency rules?',
+    a: 'Topstep\'s Consistency Score is the strictest mainstream implementation because it applies during the evaluation, not just at payout. Apex loosened its rule from 30% to 50% in March 2026. FTMO and FundedNext\'s standard Stellar challenges have no best-day consistency cap at all.',
+  },
+];
+---
+
+<Tool
+  title="Prop Firm Consistency Rule Calculator"
+  metaTitle="Prop Firm Consistency Rule Calculator (Best-Day % Checker)"
+  description="Check your best day against your firm's consistency cap: current best-day percentage, pass/fail, and the exact extra profit needed before a compliant payout."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="cr-best">Best single day profit ($)</label>
+        <input type="number" id="cr-best" value="3000" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="cr-total">Total profit in window ($)</label>
+        <input type="number" id="cr-total" value="6500" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="cr-cap">Consistency cap (%)</label>
+        <select id="cr-cap">
+          <option value="30">30% (strict — Apex pre-2026, some futures)</option>
+          <option value="40" selected>40% (common at payout)</option>
+          <option value="50">50% (Apex since Mar 2026)</option>
+          <option value="0">Custom…</option>
+        </select>
+      </div>
+      <div class="tool-field" id="cr-custom-wrap" style="display:none">
+        <label for="cr-custom">Custom cap (%)</label>
+        <input type="number" id="cr-custom" value="35" step="1" min="1" max="100" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="cr-calc">Check consistency</button>
+    </div>
+    <div class="tool-results" id="cr-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Your best-day share</div>
+          <div class="value" id="cr-share">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Cap you're checked against</div>
+          <div class="value" id="cr-capval">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Total profit needed</div>
+          <div class="value" id="cr-needed">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Additional profit to book</div>
+          <div class="value" id="cr-extra">—</div>
+        </div>
+      </div>
+      <p id="cr-comment" style="margin-top:1rem; font-weight:600"></p>
+      <p class="tool-note">
+        Consistency is measured over your firm's window (per payout cycle, per evaluation, or a
+        running score). This checks best day ÷ total profit against the cap — the arithmetic every
+        firm uses. Confirm your exact window and consequence in your dashboard terms.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Why this one number decides your payout</h2>
+    <p>
+      More payout requests are deferred by consistency rules than by any other single term, almost
+      always because traders discover the rule <em>at</em> the payout screen. The rule itself is
+      simple arithmetic: your biggest day cannot exceed a set share of total profit. If it does, the
+      firm withholds the payout until additional trading dilutes that day below the cap — it rarely
+      closes the account, but it can strand your withdrawal for weeks.
+    </p>
+    <p>
+      If this tool tells you you're over the cap, the correct response is boring on purpose: keep
+      trading your normal size and let the ratio fall. The dangerous response — forcing oversized
+      trades to close the gap — is how deferrals turn into a
+      <a href="/guides/prop-firm-drawdown-explained/">daily drawdown breach</a> that loses the whole
+      balance. Full mechanics, worked examples and the strict-vs-lenient firm map are in
+      <a href="/guides/prop-firm-consistency-rules-explained/">consistency rules explained</a>, and
+      once you clear the cap the <a href="/tools/profit-split-calculator/">profit split calculator</a>
+      shows your real take-home.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+    ($('cr-cap') as unknown as HTMLSelectElement).addEventListener('change', () => {
+      const custom = ($('cr-cap') as unknown as HTMLSelectElement).value === '0';
+      document.getElementById('cr-custom-wrap')!.style.display = custom ? '' : 'none';
+    });
+
+    document.getElementById('cr-calc')!.addEventListener('click', () => {
+      const best = parseFloat($('cr-best').value) || 0;
+      const total = parseFloat($('cr-total').value) || 0;
+      const capSel = ($('cr-cap') as unknown as HTMLSelectElement).value;
+      const capPct = (capSel === '0' ? parseFloat($('cr-custom').value) || 35 : parseFloat(capSel)) / 100;
+
+      if (best <= 0 || total <= 0 || capPct <= 0) return;
+
+      const share = best / total;
+      const needed = best / capPct;
+      const extra = Math.max(0, needed - total);
+
+      document.getElementById('cr-share')!.textContent = (share * 100).toFixed(1) + '%';
+      document.getElementById('cr-capval')!.textContent = (capPct * 100).toFixed(0) + '%';
+      document.getElementById('cr-needed')!.textContent = usd(needed);
+      document.getElementById('cr-extra')!.textContent = usd(extra);
+
+      const comment = document.getElementById('cr-comment')!;
+      if (best > total) {
+        comment.textContent = '⚠ Best day exceeds total profit — check your inputs.';
+      } else if (share <= capPct) {
+        const room = (capPct - share) * 100;
+        comment.textContent =
+          '✓ Compliant. Your best day is ' + (share * 100).toFixed(1) +
+          '% of profit, ' + room.toFixed(1) + ' points under the ' + (capPct * 100).toFixed(0) +
+          '% cap. You can request a payout on this metric.';
+      } else {
+        comment.textContent =
+          '⚠ Deferred. You need ' + usd(extra) + ' more total profit (to ' + usd(needed) +
+          ') before this day is diluted under the cap. Keep normal size — do not force it.';
+      }
+
+      document.getElementById('cr-results')!.classList.add('show');
+    });
+  </script>
+</Tool>
