@@ -47,7 +47,7 @@ The single biggest crypto mistake is carrying forex position sizing into a marke
 
 Rather than chase a "crypto-only" label, build your shortlist like this:
 
-1. Take the [most reliable firms](/best/best-prop-firms/) and check which offer crypto CFDs.
+1. Take the [most reliable firms](/best/best-prop-firms/) — most crypto CFDs sit at [forex firms](/best/best-forex-prop-firms/) — and check which offer the coins you trade.
 2. Filter for **weekend trading** and the **coins you actually trade**.
 3. Among those, prefer the **widest static drawdown** for volatility headroom.
 4. Weight the fee by a realistic pass rate with the [true cost calculator](/tools/challenge-cost-calculator/) — crypto's swings can lower effective pass rates, so the cheapest sticker price is rarely the cheapest path to funded.

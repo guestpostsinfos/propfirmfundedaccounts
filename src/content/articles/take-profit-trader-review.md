@@ -1,6 +1,6 @@
 ---
 title: "Take Profit Trader Review 2026: Daily Payouts & the Drawdown Catch"
-description: "Hands-on Take Profit Trader review — daily payouts from day one, no consistency rule, 80/20 PRO split — and the evaluation-to-funded drawdown switch that catches traders."
+description: "Hands-on Take Profit Trader review — daily payouts from day one, no consistency rule, 80/20 PRO split, and the funded-account drawdown switch that catches traders."
 category: reviews
 pubDate: 2026-07-31
 directAnswer: "Take Profit Trader is a futures firm built around three trader-friendly promises: daily payouts from day one, no consistency rule on the funded PRO account, and no payout cap above the buffer. The catch is a drawdown-type switch — the evaluation uses forgiving end-of-day drawdown, but the funded PRO account moves to intraday trailing, which is far easier to breach. Know that switch exists before you fund."

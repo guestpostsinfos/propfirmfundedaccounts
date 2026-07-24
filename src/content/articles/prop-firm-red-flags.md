@@ -36,7 +36,7 @@ Reviews are noisy, but *specific, recent, withdrawal-focused* complaints cut thr
 
 ## 4. No verifiable payout history
 
-This was *the* differentiator in the shakeout. Firms with multi-year, documented payout records mostly survived; firms that couldn't show they'd paid consistently through a full market cycle mostly didn't. A firm founded last quarter isn't automatically bad — but it is automatically *unproven*, and unproven is a risk you're taking with your challenge fee. This is why [our methodology](/methodology/) weights payout reliability at 35%.
+This was *the* differentiator in the shakeout. Firms with multi-year, documented payout records mostly survived; firms that couldn't show they'd paid consistently through a full market cycle mostly didn't. A firm founded last quarter isn't automatically bad — but it is automatically *unproven*, and unproven is a risk you're taking with your challenge fee. Watch, too, for a firm whose payout *timing* keeps slipping — unexplained delays are an early symptom, as [how long payouts take](/guides/how-long-do-prop-firm-payouts-take/) explains. This is why [our methodology](/methodology/) weights payout reliability at 35%.
 
 ## 5. Opaque ownership and jurisdiction
 
