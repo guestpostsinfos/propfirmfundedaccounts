@@ -1,0 +1,15 @@
+{
+  "_readme": "Official prop firm X/Twitter accounts the news pipeline follows. VERIFY every handle against the firm's real, verified account before enabling — a wrong handle just fetches nothing (harmless) but a lookalike could surface impostor content. Set enabled:false to skip an account. Handles below are best-known as of build time and MUST be confirmed.",
+  "accounts": [
+    { "name": "FTMO", "handle": "FTMO_com", "enabled": true },
+    { "name": "FundedNext", "handle": "FundedNext", "enabled": true },
+    { "name": "FundingPips", "handle": "FundingPips", "enabled": true },
+    { "name": "The5ers", "handle": "the5ers", "enabled": true },
+    { "name": "Topstep", "handle": "Topstep", "enabled": true },
+    { "name": "Apex Trader Funding", "handle": "Apextraderfund", "enabled": true },
+    { "name": "MyFundedFutures", "handle": "MyFundedFutures", "enabled": true },
+    { "name": "Take Profit Trader", "handle": "TakeProfitTradr", "enabled": true },
+    { "name": "E8 Markets", "handle": "E8Markets", "enabled": true },
+    { "name": "Alpha Capital Group", "handle": "AlphaCapitalGrp", "enabled": true }
+  ]
+}

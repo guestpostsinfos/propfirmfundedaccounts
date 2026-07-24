@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { title, description, category, pubDate, updatedDate, directAnswer, takeaways, faqs, review } =
+const { title, description, category, pubDate, updatedDate, directAnswer, takeaways, faqs, review, source } =
   entry.data;
 
 const url = `${SITE.url}/${category}/${entry.id}/`;
@@ -22,7 +22,7 @@ const fmt = (d: Date) =>
 // --- structured data -------------------------------------------------------
 const articleSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': category === 'news' ? 'NewsArticle' : 'Article',
   '@id': `${url}#article`,
   headline: title,
   description,
@@ -128,6 +128,23 @@ const initials = AUTHOR.name
       <div class="direct-answer">
         <strong>Quick answer:</strong> {directAnswer}
       </div>
+    )}
+
+    {source && (
+      <figure class="tweet-embed">
+        <blockquote class="twitter-tweet" data-dnt="true">
+          <a href={source.tweetUrl} rel="nofollow noopener">
+            {source.name ?? source.handle} ({source.handle}) on X
+          </a>
+        </blockquote>
+        <script is:inline async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <figcaption>
+          Source: the original post by{' '}
+          <a href={source.tweetUrl} rel="nofollow noopener" target="_blank">
+            {source.name ?? source.handle} ({source.handle})
+          </a>{' '}on X. This article summarises and adds context to that announcement.
+        </figcaption>
+      </figure>
     )}
 
     {review && (

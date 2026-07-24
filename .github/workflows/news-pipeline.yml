@@ -1,0 +1,71 @@
+name: News pipeline (prop firm tweets → posts)
+
+# Fetches new tweets from the official prop firm accounts in news-accounts.json,
+# turns the NEWSWORTHY ones into news posts (with the tweet embedded), and
+# commits them. The commit triggers the Cloudflare rebuild, so the posts go live.
+#
+# ── One-time setup ─────────────────────────────────────────────────────────
+# Add two repo secrets (Settings → Secrets and variables → Actions):
+#   X_BEARER_TOKEN     — X/Twitter API v2 bearer token (paid tier required)
+#   ANTHROPIC_API_KEY  — for converting tweets into news
+# Optional repo variables (Settings → Variables):
+#   NEWS_MODEL         — e.g. claude-haiku-4-5 to cut cost (default claude-opus-4-8)
+#   NEWS_AUTO_PUBLISH  — "1" to publish immediately (default: draft for review)
+# Until the secrets exist the job exits cleanly and changes nothing.
+
+on:
+  schedule:
+    - cron: '25 */6 * * *' # every 6 hours
+  workflow_dispatch:
+    inputs:
+      auto_publish:
+        description: 'Publish immediately instead of draft (1 = yes)'
+        required: false
+        default: ''
+
+concurrency:
+  group: news-pipeline
+  cancel-in-progress: false
+
+jobs:
+  build-news:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # allow committing new posts + state
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run news pipeline
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NEWS_MODEL: ${{ vars.NEWS_MODEL }}
+          NEWS_AUTO_PUBLISH: ${{ github.event.inputs.auto_publish || vars.NEWS_AUTO_PUBLISH }}
+          CI: 'true'
+        run: node news-pipeline.mjs
+
+      - name: Validate new content
+        run: |
+          if [ -n "$(git status --porcelain src/content/articles/)" ]; then
+            npm ci
+            node schedule-check.mjs
+          else
+            echo "No new posts this run."
+          fi
+
+      - name: Commit new posts
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing to commit."; exit 0
+          fi
+          git config user.name "news-bot"
+          git config user.email "news-bot@users.noreply.github.com"
+          git add src/content/articles/ news-state.json
+          git commit -m "News: auto-generated posts from prop firm tweets
+
+          Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
+          git push

@@ -382,6 +382,34 @@ h3 { font-size: 1.2rem; margin: 1.75rem 0 0.5rem; }
   max-width: var(--measure);
 }
 
+/* ---------- tweet embed (news posts) ---------- */
+
+.tweet-embed {
+  margin: 1.5rem 0;
+  max-width: 550px;
+}
+
+.tweet-embed .twitter-tweet {
+  margin: 0 !important;
+}
+
+/* Fallback styling before widgets.js swaps the blockquote for the real embed. */
+.tweet-embed blockquote:not(.twitter-tweet-rendered) {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brand);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.tweet-embed figcaption {
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+  margin-top: 0.5rem;
+  max-width: 550px;
+}
+
 /* ---------- tools / calculators ---------- */
 
 .tool-card {

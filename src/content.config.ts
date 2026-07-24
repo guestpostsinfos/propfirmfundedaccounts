@@ -27,6 +27,16 @@ const articles = defineCollection({
         cons: z.array(z.string()),
       })
       .optional(),
+    // For news posts built from a tweet: embeds the original X post and
+    // renders a source attribution. The embed always pulls the real tweet
+    // from X — nothing is fabricated.
+    source: z
+      .object({
+        tweetUrl: z.string().url(),
+        handle: z.string(), // e.g. "@FTMO_com"
+        name: z.string().optional(), // e.g. "FTMO"
+      })
+      .optional(),
     draft: z.boolean().default(false),
   }),
 });
