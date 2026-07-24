@@ -1,0 +1,258 @@
+{
+  "_readme": "Weekly Trustpilot tracking data for the /trustpilot-reviews/ tracker. Scores and review counts are REAL, search-verified public figures (Trustpilot blocks scraping, so they are gathered via search and cross-checked across sources; per-snapshot 'asOf' and 'sources' record when/where). 'praise'/'complaints' are recurring sentiment THEMES from the real review corpus — never fabricated verbatim reviews with invented reviewer names. RANKING/movement is driven by TrustScore only. The first comparison uses each firm's previous published figure (baseline dates vary, see prior 'asOf'); from here, add a new object to 'weeks' each week (Monday date) via trustpilot-update.mjs so deltas become true week-over-week.",
+  "updated": "2026-07-24",
+  "firms": [
+    { "slug": "ftmo", "name": "FTMO", "market": "forex", "trustpilotUrl": "https://www.trustpilot.com/review/ftmo.com", "reviewPage": "/reviews/ftmo-review/" },
+    { "slug": "fundednext", "name": "FundedNext", "market": "forex", "trustpilotUrl": "https://www.trustpilot.com/review/fundednext.com", "reviewPage": "/reviews/fundednext-review/" },
+    { "slug": "fundingpips", "name": "FundingPips", "market": "forex", "trustpilotUrl": "https://www.trustpilot.com/review/fundingpips.com", "reviewPage": "/reviews/fundingpips-review/" },
+    { "slug": "the5ers", "name": "The5ers", "market": "forex", "trustpilotUrl": "https://www.trustpilot.com/review/the5ers.com", "reviewPage": "/reviews/the5ers-review/" },
+    { "slug": "topstep", "name": "Topstep", "market": "futures", "trustpilotUrl": "https://www.trustpilot.com/review/topstep.com", "reviewPage": "/reviews/topstep-review/" },
+    { "slug": "apex", "name": "Apex Trader Funding", "market": "futures", "trustpilotUrl": "https://www.trustpilot.com/review/apextraderfunding.com", "reviewPage": "/reviews/apex-trader-funding-review/" },
+    { "slug": "myfundedfutures", "name": "MyFundedFutures", "market": "futures", "trustpilotUrl": "https://www.trustpilot.com/review/myfundedfutures.com", "reviewPage": "/reviews/myfundedfutures-review/" },
+    { "slug": "takeprofittrader", "name": "Take Profit Trader", "market": "futures", "trustpilotUrl": "https://www.trustpilot.com/review/takeprofittrader.com", "reviewPage": "/reviews/take-profit-trader-review/" },
+    { "slug": "e8markets", "name": "E8 Markets", "market": "forex", "trustpilotUrl": "https://www.trustpilot.com/review/e8markets.com", "reviewPage": "/reviews/e8-markets-review/" },
+    { "slug": "alphacapital", "name": "Alpha Capital Group", "market": "forex", "trustpilotUrl": "https://www.trustpilot.com/review/alphacapitalgroup.uk", "reviewPage": "/reviews/alpha-capital-group-review/" }
+  ],
+  "weeks": [
+    {
+      "weekOf": "2026-07-13",
+      "note": "Baseline: each firm's previous published Trustpilot figure. Dates vary (see asOf).",
+      "snapshots": {
+        "ftmo": { "score": 4.8, "reviews": 44470, "asOf": "2026-06-25" },
+        "fundednext": { "score": 4.5, "reviews": 68135, "asOf": "2026-01" },
+        "fundingpips": { "score": 4.5, "reviews": 51000, "asOf": "2026-06-02" },
+        "topstep": { "score": 3.5, "reviews": 14272, "asOf": "2026-06" },
+        "apex": { "score": 4.4, "reviews": 18588, "asOf": "2026-04" },
+        "myfundedfutures": { "score": 4.9, "reviews": 19925, "asOf": "2026-07-11" },
+        "takeprofittrader": { "score": 4.4, "reviews": 9302, "asOf": "2026-05" },
+        "e8markets": { "score": 4.4, "reviews": 3227, "asOf": "2026-04" },
+        "alphacapital": { "score": 4.7, "reviews": 16166, "asOf": "2026-01-25" }
+      }
+    },
+    {
+      "weekOf": "2026-07-20",
+      "snapshots": {
+        "ftmo": {
+          "score": 4.8,
+          "reviews": 46614,
+          "asOf": "2026-07-24",
+          "dist": null,
+          "praise": [
+            "Fast, reliable payouts (often processed within 24 hours)",
+            "Challenge/evaluation fee refunded with the first payout",
+            "Responsive, multilingual customer support",
+            "Clear, transparent and consistently applied rules",
+            "Solid platform and analytics tools (MetriX dashboard, coaching)"
+          ],
+          "complaints": [
+            "Account terminations/breaches seen as unfair or triggered by edge cases",
+            "Strict rules and a demanding evaluation (low first-attempt pass rate)",
+            "Slower support response times during high-volume periods",
+            "Challenge fees / pricing viewed as expensive",
+            "Disputes over the consistency rule or broker execution affecting payouts"
+          ],
+          "take": "FTMO remains the most-reviewed and one of the highest-rated prop firms on Trustpilot, holding a stable 4.8/5 across 46,000+ reviews that consistently praise reliable payouts, fee refunds and support. Negative feedback clusters on strict rule enforcement and occasional breach/consistency disputes rather than non-payment, so disciplined traders who follow the rules tend to have the smoothest experience.",
+          "sources": ["https://bestpropfirmguide.com/firm/ftmo/", "https://responsibletrading.com/ftmo-trustpilot-rating-2026-what-30000-reviews-actually-tell-you/", "https://thetrustedprop.com/prop-firms/ftmo"]
+        },
+        "fundednext": {
+          "score": 4.5,
+          "reviews": 73876,
+          "asOf": "2026-07",
+          "dist": null,
+          "praise": [
+            "Fast, reliable payouts often processed within hours",
+            "Responsive and helpful live-chat customer support",
+            "Generous profit splits and a rewarding scaling structure",
+            "Flexible, achievable challenge models (no time limits, consistency options)",
+            "Stable platform with broad account and market variety (CFD & Futures)"
+          ],
+          "complaints": [
+            "Accounts breached near payout eligibility, sometimes citing rule violations without clear evidence",
+            "Slippage and spread widening on funded accounts during news events",
+            "Inconsistent support quality, with tickets left unanswered on complex cases",
+            "Strict enforcement of prohibited-strategy rules (EA/copy/news trading)",
+            "Withdrawal/payout fees (up to ~3.5%) and occasional payout delays beyond stated timeframes"
+          ],
+          "take": "FundedNext carries one of the strongest and highest-volume Trustpilot profiles in the prop space (4.5/5 across ~74k reviews), with consistent praise for fast payouts and responsive support. The recurring risks to weigh are near-payout account breaches and strict rule enforcement, so read the trading rules carefully before scaling.",
+          "sources": ["https://www.proptradingvibes.com/blog/fundednext-trustpilot-reviews", "https://completetradersedge.com/fundednext-review-2026/"]
+        },
+        "fundingpips": {
+          "score": 4.5,
+          "reviews": 62062,
+          "asOf": "2026-07",
+          "dist": { "five": 82, "four": 7, "three": 2, "two": 1, "one": 8 },
+          "praise": [
+            "Fast payouts, often processed within hours",
+            "Responsive support via an active Discord community",
+            "Intuitive, easy-to-use trader dashboard",
+            "Clear and transparent trading rules",
+            "Good-value, low-cost challenges with reliable withdrawals"
+          ],
+          "complaints": [
+            "News-trading restrictions on funded accounts",
+            "Account closures tied to the Risk Per Trade Idea rule, often unexplained",
+            "Confusion over how the daily-loss and 1% max-risk rules are applied",
+            "Program changes moving profitable traders to trailing drawdown with lower splits",
+            "Ambiguous equity-on-balance breach notices near payout windows"
+          ],
+          "take": "FundingPips holds a steady 4.5/5 across one of the largest review volumes in the prop space (60k+), with consistent praise for fast payouts and support. Most negativity clusters around rule-enforcement disputes and account closures, so study the risk and news-trading rules closely before funding.",
+          "sources": ["https://proptradingvibes.com/blog/fundingpips-trustpilot", "https://www.fxempire.com/prop-firms/fundingpips"]
+        },
+        "the5ers": {
+          "score": 4.7,
+          "reviews": 32288,
+          "asOf": "2026-07",
+          "dist": null,
+          "praise": [
+            "Transparent, verified payouts ($43M+ paid across 20k+ payouts)",
+            "Low-pressure, no-time-limit funded model built for longevity",
+            "Scaling program that grows accounts toward $4M in capital",
+            "Low-cost challenges with profit splits up to 100%",
+            "Established track record (funding traders since 2016) on MT5"
+          ],
+          "complaints": [
+            "Conservative starting capital and a slow path to larger accounts",
+            "Support response times on complex or payout-related cases",
+            "An extra verification/interview step reported before some payouts",
+            "Rule strictness that can catch certain trading styles",
+            "Targets that some traders find hard relative to the small starting balance"
+          ],
+          "take": "The5ers holds a strong ~4.7 Trustpilot score across 30,000+ reviews, backed by a long record of transparent, verified payouts ($43M+ paid) and a low-pressure scaling model reaching up to $4M. Complaints are mostly operational — support friction and a conservative, slow-scaling evaluation — rather than payment-integrity concerns.",
+          "sources": ["https://tradersunion.com/reviews/the5ers-com/", "https://www.directionsmag.com/reviews/prop-trading-firms/5ers-prop-firm", "https://completetradersedge.com/the5ers-review/"]
+        },
+        "topstep": {
+          "score": 3.6,
+          "reviews": 14448,
+          "asOf": "2026-07-21",
+          "dist": null,
+          "praise": [
+            "Fast, reliable payouts (often next trading day via Wise)",
+            "Long, proven track record and legitimacy (funding traders since 2012)",
+            "Genuine funded capital with transparent, clearly written rules",
+            "Solid trader education, coaching and community resources",
+            "Recent TopstepX platform interface improvements"
+          ],
+          "complaints": [
+            "Intraday trailing drawdown locks accounts during winning sessions on normal pullbacks",
+            "Strict rule enforcement causing account closures traders feel are minor or unclear",
+            "Recurring Combine subscription / auto-renewal fees add up and cause billing confusion",
+            "Proprietary TopstepX platform seen as a downgrade from TradingView, plus occasional outages",
+            "Slow or unhelpful support during high-volume events (NFP, FOMC)"
+          ],
+          "take": "Topstep is one of the longest-running futures prop firms with a large review base and a strong payout reputation, but its middling ~3.6 TrustScore is weighed down by its tight intraday trailing-drawdown mechanic and complaints about the TopstepX platform. It suits disciplined traders comfortable with strict intraday risk rules rather than those chasing loose evaluations.",
+          "sources": ["https://www.proptradingvibes.com/blog/topstep-trustpilot-reviews", "https://www.propscorer.com/firms/topstep"]
+        },
+        "apex": {
+          "score": 4.2,
+          "reviews": 20299,
+          "asOf": "2026-07-22",
+          "dist": null,
+          "praise": [
+            "Fast, automated payouts (often within 24-48 hours under the 4.0 system)",
+            "Cheap, frequently discounted evaluations",
+            "Lenient, easy-to-pass evaluation rules",
+            "Responsive and helpful customer support",
+            "Generous profit split and a wide range of account sizes"
+          ],
+          "complaints": [
+            "Payouts held, delayed or denied — sometimes citing rules users say were removed",
+            "Accounts closed after becoming profitable, with vague 'erratic/windfall trading' reasoning",
+            "Confusing, frequent rule changes since the March 2026 4.0 rebuild",
+            "Recurring subscription billing users forgot to cancel",
+            "Support goes quiet during disputes; strict compliance checks (ID/video) on large withdrawals"
+          ],
+          "take": "Apex remains one of the most-reviewed futures prop firms, holding a still-strong ~4.2 TrustScore across 20,000+ reviews, with traders praising cheap, easy evaluations and fast automated payouts. The score has drifted down from 4.4 earlier in 2026 as complaints about held or denied payouts and post-4.0 rule changes persist, so read the current payout rules closely before funding.",
+          "sources": ["https://www.propscorer.com/firms/apex-trader-funding", "https://propfirmmap.com/blog/apex-trader-funding-review-2026-payouts-profit-split-otp"]
+        },
+        "myfundedfutures": {
+          "score": 4.9,
+          "reviews": 20122,
+          "asOf": "2026-07-22",
+          "dist": { "five": 95, "four": 3, "three": 0, "two": 0, "one": 2 },
+          "praise": [
+            "Fast, reliable payouts (often within 24-48h via Rise)",
+            "Responsive, helpful live-chat support",
+            "No daily loss limit on the plans",
+            "Smooth path from evaluation to funded accounts",
+            "Good variety of plans and platform flexibility"
+          ],
+          "complaints": [
+            "Repeated/extra KYC verification requests before payout",
+            "Accounts held or flagged for alleged rule violations after payout requests",
+            "The Feb 2026 profit-split cut from 90% to 80% drew backlash",
+            "Pricing higher than rivals, plus Pro-tier price increases",
+            "Consistency-rule friction on evaluations and weak support escalation"
+          ],
+          "take": "MyFundedFutures holds an exceptional ~4.9 Trustpilot score across roughly 20,000 reviews, powered by consistently fast payouts and responsive support. The main friction points traders raise are extra KYC checks, occasional rule-based account holds, and lingering resentment over the early-2026 profit-split reduction to 80%.",
+          "sources": ["https://www.propscorer.com/firms/myfundedfutures", "https://proptradingvibes.com/prop-firms/myfundedfutures"]
+        },
+        "takeprofittrader": {
+          "score": 4.4,
+          "reviews": 9979,
+          "asOf": "2026-07-22",
+          "dist": { "five": 80, "four": 5, "three": 2, "two": 1, "one": 12 },
+          "praise": [
+            "Fast, reliable payouts (often same or next day)",
+            "Day-one payout eligibility on PRO accounts, no minimum trading days",
+            "Clear, well-documented rules and a straightforward evaluation",
+            "Helpful, professional support agents (named staff praised)",
+            "Established, trusted futures firm operating since 2021"
+          ],
+          "complaints": [
+            "PRO-phase intraday trailing drawdown catches traders off guard",
+            "Accounts banned or disabled after becoming profitable",
+            "Slow or unresponsive support during disputes and busy periods",
+            "Payout delays and accounts left 'under review' without explanation",
+            "Tradovate platform stability issues and outages"
+          ],
+          "take": "Take Profit Trader remains one of the most-reviewed futures prop firms, holding a roughly 4.4/5 'Excellent' TrustScore across nearly 10,000 reviews, with fast day-one payouts driving most of the praise. Weigh that against a persistent negative cluster around the PRO-phase intraday trailing drawdown and reports of accounts being restricted after they turn profitable.",
+          "sources": ["https://www.propscorer.com/reviews/take-profit-trader", "https://thetrustedprop.com/prop-firms/takeprofittrader"]
+        },
+        "e8markets": {
+          "score": 4.3,
+          "reviews": 3275,
+          "asOf": "2026-07",
+          "dist": { "five": 85, "four": 4, "three": 1, "two": 1, "one": 9 },
+          "praise": [
+            "Fast, reliable on-demand payouts",
+            "Responsive and helpful customer support",
+            "Smooth, straightforward evaluation process",
+            "Clear rules and a transparent account dashboard",
+            "Good value: high profit split and scaling"
+          ],
+          "complaints": [
+            "Confusing consistency / Best-Day rule causing breaches",
+            "Disputed payout denials or account closures",
+            "KYC verification delays and failures",
+            "Platform limits for US traders (no MT5/cTrader) and MT5 glitches",
+            "Initial payout wait period and trading costs"
+          ],
+          "take": "E8 Markets holds a solid 4.3 'Excellent' Trustpilot score across roughly 3,300 reviews, with most traders praising fast payouts and responsive support. The near-9% one-star share reflects recurring friction over funded-stage consistency rules, KYC/verification, and US platform restrictions, so read the rulebook carefully before buying.",
+          "sources": ["https://propfirmmap.com/firms/e8markets", "https://thetrustedprop.com/prop-firms/e8-markets"]
+        },
+        "alphacapital": {
+          "score": 4.7,
+          "reviews": 21051,
+          "asOf": "2026-07-24",
+          "dist": { "five": 86, "four": 5, "three": 1, "two": 1, "one": 7 },
+          "praise": [
+            "Reliable, consistent payouts (often received within one business day)",
+            "Responsive, helpful support with praised named agents",
+            "User-friendly dashboard and smooth funding/account setup",
+            "Wide platform choice (MT5, cTrader, DXTrade, TradeLocker) with competitive spreads",
+            "Fast account activation after passing evaluation stages"
+          ],
+          "complaints": [
+            "Occasional payout delays and slow payment-team email support",
+            "The 2-minute minimum trade duration rule causing denied payouts for scalpers",
+            "Stricter risk groups and reduced leverage imposed after passing",
+            "Account closures/bans flagged late or without clear prior warning, plus KYC inconsistencies",
+            "No challenge-fee refund on passing; limited instruments and no swap-free accounts"
+          ],
+          "take": "Alpha Capital Group holds a strong, notably stable 4.7 'Excellent' Trustpilot score across ~21,000 reviews (about 86% five-star), reflecting generally reliable payouts and responsive support. The ~7% one-star reviews cluster around the 2-minute trade rule, tighter post-funding risk limits, and late account closures, so read the rulebook closely before buying a challenge.",
+          "sources": ["https://propfirmmap.com/firms/alphacapitalgroup", "https://thetrustedprop.com/prop-firms/alpha-capital-group"]
+        }
+      }
+    }
+  ]
+}

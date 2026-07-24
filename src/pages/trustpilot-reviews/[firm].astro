@@ -1,0 +1,426 @@
+---
+import Base from '../../layouts/Base.astro';
+import { AUTHOR, SITE } from '../../consts';
+import {
+  leaderboard,
+  historyFor,
+  latestWeek,
+  weekLabel,
+  UPDATED,
+} from '../../data/trustpilot.mjs';
+import { livePosts } from '../../publish';
+
+export function getStaticPaths() {
+  const board = leaderboard();
+  return board.map((row) => ({
+    params: { firm: row.slug },
+    props: { row, history: historyFor(row.slug) },
+  }));
+}
+
+const { row, history } = Astro.props;
+const s = row.snapshot || {};
+const latest = latestWeek();
+const weekOf = latest ? weekLabel(latest.weekOf) : '';
+const url = `${SITE.url}/trustpilot-reviews/${row.slug}/`;
+
+const scoreStr = row.score != null ? row.score.toFixed(1) : '—';
+const reviewsStr = row.reviews != null ? row.reviews.toLocaleString('en-US') : '—';
+const trendLabel = { up: 'Rising', down: 'Falling', steady: 'Steady', new: 'Newly tracked' };
+
+const praise = s.praise || [];
+const complaints = s.complaints || [];
+const dist = s.dist || null;
+const sources = s.sources || [];
+
+const deltaText =
+  row.scoreDelta == null
+    ? `This is ${row.name}'s first reading in our tracker, so there is no prior TrustScore to compare against yet — check back next week for its first week-over-week move.`
+    : row.scoreDelta > 0
+      ? `${row.name}'s TrustScore rose ${row.scoreDelta.toFixed(1)} point${row.scoreDelta === 0.1 ? '' : 's'} since the previous reading (from ${row.prevScore.toFixed(1)} to ${row.score.toFixed(1)}), moving it up the ranking. A rising score usually tracks smoother payouts and fewer rule complaints.`
+      : row.scoreDelta < 0
+        ? `${row.name}'s TrustScore slipped ${Math.abs(row.scoreDelta).toFixed(1)} since the previous reading (from ${row.prevScore.toFixed(1)} to ${row.score.toFixed(1)}), dropping it down the ranking. A falling score is often the earliest public sign of a payout delay or an unpopular rule change — read recent reviews before buying.`
+        : `${row.name}'s TrustScore held steady at ${row.score.toFixed(1)} versus the previous reading, keeping its place in the ranking.`;
+
+const description =
+  row.score != null
+    ? `${row.name}'s Trustpilot rating is ${scoreStr}/5 from ${reviewsStr} reviews (week of ${weekOf}). What traders praise and complain about — plus our verdict.`
+    : `${row.name} Trustpilot reviews and rating, tracked weekly. What traders praise and complain about on Trustpilot, plus our independent verdict.`;
+
+const faqs = [
+  {
+    q: `What is ${row.name}'s Trustpilot rating?`,
+    a:
+      row.score != null
+        ? `As of the week of ${weekOf}, ${row.name} holds a Trustpilot TrustScore of ${scoreStr} out of 5 from ${reviewsStr} reviews. We update this figure every week and track how it moves.`
+        : `We track ${row.name}'s Trustpilot TrustScore and review count every week on this page. See the rating snapshot above for the latest figure.`,
+  },
+  {
+    q: `Is ${row.name} legit according to Trustpilot reviews?`,
+    a: `${row.name}'s Trustpilot reviews skew ${row.score != null && row.score >= 4.5 ? 'strongly positive' : row.score != null && row.score >= 4 ? 'positive' : 'mixed'}, with reviewers most often praising ${praise[0] ? praise[0].toLowerCase() : 'the funded-account experience'}. The most common complaints centre on ${complaints[0] ? complaints[0].toLowerCase() : 'support and rule clarity'}. Trustpilot sentiment is a useful signal but not proof on its own — pair it with our hands-on review, which weights documented payouts and rule fairness.`,
+  },
+  {
+    q: `Why does ${row.name}'s Trustpilot score change week to week?`,
+    a: `A TrustScore moves as new reviews come in and older ones age out of the weighting. Small weekly moves are normal; a sharp drop is worth investigating, because it often coincides with a payout delay, an outage or a rule change that upset customers. That's exactly what this weekly tracker is built to catch.`,
+  },
+];
+
+const firmEntity = {
+  '@type': 'FinancialService',
+  name: row.name,
+  url: row.trustpilotUrl,
+};
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    headline: `${row.name} Trustpilot Reviews & Rating`,
+    description,
+    about: firmEntity,
+    datePublished: latest ? latest.weekOf : UPDATED,
+    dateModified: UPDATED,
+    mainEntityOfPage: url,
+    author: {
+      '@type': 'Person',
+      name: AUTHOR.name,
+      jobTitle: AUTHOR.role,
+      url: `${SITE.url}${AUTHOR.url}`,
+    },
+    publisher: { '@id': `${SITE.url}/#organization` },
+    isBasedOn: row.trustpilotUrl,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE.url}/` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Trustpilot Reviews Tracker',
+        item: `${SITE.url}/trustpilot-reviews/`,
+      },
+      { '@type': 'ListItem', position: 3, name: `${row.name} Trustpilot Reviews & Rating`, item: url },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+];
+
+const board = leaderboard();
+const others = board.filter((r) => r.slug !== row.slug);
+
+// Respect the temporal rule: only link to a firm's own review once it's live.
+const liveReviewRoutes = new Set(
+  (await livePosts((d) => d.category === 'reviews')).map((e) => `/reviews/${e.id}/`),
+);
+const reviewLive = liveReviewRoutes.has(row.reviewPage);
+const distRows = dist
+  ? [
+      ['5-star', dist.five],
+      ['4-star', dist.four],
+      ['3-star', dist.three],
+      ['2-star', dist.two],
+      ['1-star', dist.one],
+    ].filter(([, v]) => v != null)
+  : [];
+---
+
+<Base
+  title={`${row.name} Trustpilot Reviews & Rating`}
+  description={description}
+  schema={schema}
+  ogType="article"
+  modifiedTime={UPDATED}
+>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/trustpilot-reviews/">Trustpilot Tracker</a></li>
+        <li aria-current="page">{row.name}</li>
+      </ol>
+    </nav>
+
+    <header class="fh">
+      <div class="fh-main">
+        <span class={`mkt mkt-${row.market}`}>{row.market}</span>
+        <h1>{row.name} Trustpilot Reviews &amp; Rating</h1>
+        <p class="fh-sub">
+          The latest Trustpilot standing for <strong>{row.name}</strong> — TrustScore, review
+          volume and week-over-week movement, with what reviewers consistently praise and complain
+          about, plus our independent take. Snapshot: <strong>week of {weekOf}</strong>.
+        </p>
+      </div>
+    </header>
+
+    <!-- ===== RATING SNAPSHOT ===== -->
+    <section class="snap" aria-label={`${row.name} Trustpilot rating snapshot`}>
+      <div class="snap-score">
+        <span class="stars" aria-hidden="true" style={`--pct:${row.score != null ? (row.score / 5) * 100 : 0}%`}>★★★★★</span>
+        <div class="snap-num">{scoreStr}<small>/5</small></div>
+        <div class="snap-rev">{reviewsStr} reviews</div>
+        <span class={`trend trend-${row.trend}`}>{trendLabel[row.trend]}</span>
+      </div>
+      <div class="snap-meta">
+        <div class="sm-row">
+          <span class="sm-l">Rank this week</span>
+          <span class="sm-v">
+            #{row.rank ?? '—'} of {board.length}
+            {row.rankDelta != null && row.rankDelta !== 0 && (
+              <span class={`rankmove ${row.rankDelta > 0 ? 'up' : 'down'}`}>
+                {row.rankDelta > 0 ? `▲ ${row.rankDelta}` : `▼ ${Math.abs(row.rankDelta)}`} vs last reading
+              </span>
+            )}
+          </span>
+        </div>
+        <div class="sm-row">
+          <span class="sm-l">Rating vs last reading</span>
+          <span class={`sm-v ${row.trend}`}>
+            {row.scoreDelta == null
+              ? 'New'
+              : row.scoreDelta === 0
+                ? '±0.0 (steady)'
+                : row.scoreDelta > 0
+                  ? `▲ +${row.scoreDelta.toFixed(1)}`
+                  : `▼ ${row.scoreDelta.toFixed(1)}`}
+          </span>
+        </div>
+        <div class="sm-row">
+          <span class="sm-l">Total reviews</span>
+          <span class="sm-v">{reviewsStr}</span>
+        </div>
+        {distRows.length > 0 && (
+          <div class="dist">
+            {distRows.map(([label, v]) => (
+              <div class="dist-row">
+                <span class="dist-l">{label}</span>
+                <span class="dist-bar"><span class="dist-fill" style={`width:${v}%`}></span></span>
+                <span class="dist-v">{v}%</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <a class="tp-out" href={row.trustpilotUrl} rel="nofollow noopener" target="_blank">
+          Read {row.name}'s reviews on Trustpilot →
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== WEEK MOVE ===== -->
+    <aside class={`weekmove ${row.trend}`}>
+      <strong>Recent movement:</strong> {deltaText}
+    </aside>
+
+    <!-- ===== PRAISE / COMPLAINTS ===== -->
+    <section class="pc" aria-label="What reviewers say">
+      <h2>{row.name} Trustpilot reviews: what traders say</h2>
+      <p class="pc-intro">
+        The five points {row.name} reviewers raise most often on each side. These are recurring
+        <em>themes</em> across the review corpus (Trustpilot doesn't permit republishing individual
+        reviews) — follow the link above to read the reviews in full.
+      </p>
+      <div class="pc-grid">
+        <div class="pc-col pros">
+          <h3>👍 Top 5 things reviewers praise</h3>
+          {praise.length ? (
+            <ol>{praise.map((p) => <li>{p}</li>)}</ol>
+          ) : (
+            <p class="pc-empty">Positive themes for this week are being compiled.</p>
+          )}
+        </div>
+        <div class="pc-col cons">
+          <h3>👎 Top 5 things reviewers complain about</h3>
+          {complaints.length ? (
+            <ol>{complaints.map((c) => <li>{c}</li>)}</ol>
+          ) : (
+            <p class="pc-empty">Negative themes for this week are being compiled.</p>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== OUR TAKE ===== -->
+    <section class="take" aria-label="Our verdict">
+      <h2>Our take on {row.name}'s Trustpilot rating</h2>
+      {s.take && <p class="take-lead">{s.take}</p>}
+      <p>
+        A {scoreStr}/5 TrustScore across {reviewsStr} reviews tells you {row.name} keeps most of its
+        customers happy — but remember what a Trustpilot score can and can't tell you. It captures
+        <strong>sentiment</strong>: how people feel about support, payouts and rule changes right
+        now. It does <strong>not</strong> verify that a firm is solvent, that payouts clear, or that
+        the rules are fair — and scores can be nudged upward when a firm actively asks satisfied
+        customers to review it. Treat a strong score as a green flag, not a guarantee, and weight a
+        <em>falling</em> score heavily: it's often the first public crack before a policy problem.
+      </p>
+      <p>
+        For the full picture, our{' '}
+        {reviewLive ? (
+          <a href={row.reviewPage}>hands-on {row.name} review</a>
+        ) : (
+          <a href="/reviews/">hands-on prop firm reviews</a>
+        )}{' '}
+        {reviewLive ? 'goes' : 'go'} past sentiment to what actually matters — documented payout
+        reliability, drawdown mechanics and real cost to a funded account — scored with our public
+        <a href="/methodology/"> methodology</a>. Read them together: Trustpilot for the mood, our
+        reviews for the mechanics.
+      </p>
+    </section>
+
+    <!-- ===== HISTORY ===== -->
+    {history.length > 1 && (
+      <section class="hist" aria-label={`${row.name} Trustpilot rating history`}>
+        <h2>{row.name} Trustpilot rating history</h2>
+        <div class="tp-table-wrap">
+          <table class="hist-table">
+            <thead>
+              <tr><th>Week of</th><th>TrustScore</th><th>Reviews</th></tr>
+            </thead>
+            <tbody>
+              {[...history].reverse().map((h) => (
+                <tr>
+                  <td>{h.label}</td>
+                  <td class="ht-score">{h.score.toFixed(1)}<small>/5</small></td>
+                  <td>{h.reviews != null ? h.reviews.toLocaleString('en-US') : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq" aria-label="Frequently asked questions">
+      <h2>{row.name} Trustpilot reviews — FAQ</h2>
+      {faqs.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <div class="faq-a"><p>{f.a}</p></div>
+        </details>
+      ))}
+    </section>
+
+    {sources.length > 0 && (
+      <section class="src" aria-label="Sources">
+        <h2>Sources</h2>
+        <ul>
+          <li>
+            <a href={row.trustpilotUrl} rel="nofollow noopener" target="_blank">
+              {row.name} on Trustpilot
+            </a> — live TrustScore and reviews
+          </li>
+          {sources.map((u) => (
+            <li><a href={u} rel="nofollow noopener" target="_blank">{u}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- ===== OTHER FIRMS ===== -->
+    <section class="others" aria-label="Other prop firms">
+      <h2>Compare other prop firms' Trustpilot ratings</h2>
+      <ul class="others-list">
+        {others.map((o) => (
+          <li>
+            <a href={`/trustpilot-reviews/${o.slug}/`}>
+              <span class="o-name">{o.name}</span>
+              <span class="o-score">{o.score != null ? o.score.toFixed(1) : '—'}<small>/5</small></span>
+              <span class={`trend trend-${o.trend} o-trend`}>{trendLabel[o.trend]}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="others-back"><a href="/trustpilot-reviews/">← Back to the full weekly ranking</a></p>
+    </section>
+  </div>
+
+  <style>
+    .fh { margin-top: 0.5rem; }
+    .mkt { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.15rem 0.5rem; border-radius: 999px; }
+    .mkt-forex { background: var(--brand-tint); color: var(--brand-dark); }
+    .mkt-futures { background: #e6eef7; color: #234b74; }
+    .fh h1 { margin: 0.5rem 0 0.5rem; }
+    .fh-sub { color: var(--ink-soft); max-width: 66ch; margin: 0; font-size: 1.08rem; }
+
+    .snap { display: grid; grid-template-columns: minmax(190px, 240px) 1fr; gap: 1.25rem; margin: 1.75rem 0 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .snap-score { background: var(--brand-tint); padding: 1.4rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+    .snap-num { font-size: 2.75rem; font-weight: 800; color: var(--brand-dark); line-height: 1; font-variant-numeric: tabular-nums; }
+    .snap-num small { font-size: 1.1rem; color: var(--ink-faint); font-weight: 700; }
+    .snap-rev { font-size: 0.9rem; color: var(--ink-soft); }
+    .snap-meta { padding: 1.2rem 1.3rem; }
+    .sm-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px dashed var(--line); }
+    .sm-l { font-size: 0.85rem; color: var(--ink-soft); }
+    .sm-v { font-weight: 800; font-variant-numeric: tabular-nums; }
+    .sm-v.up { color: var(--brand); }
+    .sm-v.down { color: var(--danger); }
+    .rankmove { font-size: 0.72rem; font-weight: 700; margin-left: 0.4rem; }
+    .rankmove.up { color: var(--brand); }
+    .rankmove.down { color: var(--danger); }
+
+    .stars { --pct: 96%; position: relative; display: inline-block; font-size: 1.35rem; letter-spacing: 2px; line-height: 1; color: #d8dcd8; }
+    .stars::before { content: '★★★★★'; position: absolute; top: 0; left: 0; width: var(--pct); overflow: hidden; color: #f5b301; white-space: nowrap; }
+    .trend { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .trend-up { background: #fff; color: var(--brand-dark); border: 1px solid var(--brand); }
+    .trend-down { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
+    .trend-steady { background: #fff; color: var(--ink-soft); border: 1px solid var(--line); }
+    .trend-new { background: #fff; color: #8a5e12; border: 1px solid #ecd9b0; }
+
+    .dist { margin: 0.85rem 0 0.5rem; }
+    .dist-row { display: grid; grid-template-columns: 52px 1fr 40px; align-items: center; gap: 0.5rem; margin: 0.25rem 0; }
+    .dist-l { font-size: 0.78rem; color: var(--ink-soft); }
+    .dist-bar { background: var(--bg-alt); border-radius: 999px; height: 9px; overflow: hidden; }
+    .dist-fill { display: block; height: 100%; background: #f5b301; }
+    .dist-v { font-size: 0.78rem; text-align: right; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+    .tp-out { display: inline-block; margin-top: 0.75rem; font-weight: 700; text-decoration: none; }
+
+    .weekmove { border-left: 4px solid var(--line); background: var(--bg-alt); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin: 1rem 0 2rem; color: var(--ink-soft); max-width: var(--measure); }
+    .weekmove.up { border-left-color: var(--brand); background: var(--brand-tint); }
+    .weekmove.down { border-left-color: var(--danger); background: var(--danger-tint); }
+    .weekmove strong { color: var(--ink); }
+
+    .pc-intro { color: var(--ink-soft); max-width: var(--measure); }
+    .pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-top: 1rem; }
+    .pc-col { border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .pc-col.pros { border-top: 3px solid var(--brand); }
+    .pc-col.cons { border-top: 3px solid var(--danger); }
+    .pc-col h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+    .pc-col ol { margin: 0; padding-left: 1.2rem; }
+    .pc-col li { margin: 0.4rem 0; color: var(--ink-soft); }
+    .pc-empty { color: var(--ink-faint); font-style: italic; }
+
+    .take p { max-width: var(--measure); color: var(--ink-soft); }
+    .take-lead { font-size: 1.1rem; color: var(--ink) !important; font-weight: 600; border-left: 3px solid var(--accent); padding-left: 0.9rem; }
+
+    .tp-table-wrap { overflow-x: auto; }
+    .hist-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .hist-table th { text-align: left; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); border-bottom: 2px solid var(--line); padding: 0.5rem 0.7rem; }
+    .hist-table td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    .ht-score { font-weight: 700; }
+    .ht-score small, .o-score small { font-size: 0.7rem; color: var(--ink-faint); font-weight: 600; }
+
+    .others-list { list-style: none; padding: 0; margin: 1rem 0 0.75rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.6rem; }
+    .others-list a { display: flex; align-items: center; gap: 0.6rem; border: 1px solid var(--line); border-radius: var(--radius); padding: 0.6rem 0.85rem; text-decoration: none; color: var(--ink); }
+    .others-list a:hover { border-color: var(--brand); }
+    .o-name { flex: 1; font-weight: 700; }
+    .o-score { font-weight: 800; color: var(--brand-dark); font-variant-numeric: tabular-nums; }
+    .o-trend { flex: 0 0 auto; }
+
+    .src ul { max-width: var(--measure); }
+    .src a { word-break: break-word; }
+
+    @media (max-width: 640px) {
+      .snap { grid-template-columns: 1fr; }
+      .pc-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</Base>
