@@ -1,0 +1,146 @@
+---
+import Tool from '../../layouts/Tool.astro';
+import { beforePublish } from '../../publish';
+
+// Scheduled publish — hidden until the date; the daily rebuild flips it live.
+if (beforePublish('2026-08-20T00:00:00Z')) return Astro.redirect('/tools/');
+
+const faqs = [
+  {
+    q: 'When can I first withdraw from a prop firm account?',
+    a: 'You typically become eligible once you have met the minimum number of funded trading days (often 5–14) and reached your firm\'s next payout cycle. This calculator estimates that first eligible date from your funded start date, how many days a week you trade, the minimum trading days, and the cycle length, so you know when to expect your first request to be valid.',
+  },
+  {
+    q: 'What is a payout cycle?',
+    a: 'A payout cycle is how often a firm processes withdrawals — commonly every 14 days, though some offer weekly, on-demand or even daily payouts. Your request is paid on the next cycle date after you become eligible, not instantly, so the cycle length is a major part of your true time-to-first-payout.',
+  },
+  {
+    q: 'Why is my payout later than the calculator says?',
+    a: 'Common reasons are incomplete KYC verification, a consistency-rule deferral (your best day is too large a share of profit), an unbuilt profit buffer on futures accounts, or requesting before the minimum trading days are met. This tool estimates eligibility timing; the actual payout can still be delayed by any of those rule checks. Complete KYC early to remove the most avoidable one.',
+  },
+  {
+    q: 'Do weekends count toward minimum trading days?',
+    a: 'Usually only days you actually place a trade count, and most markets you can trade are closed on weekends, so a five-day trading week is the normal assumption. If you trade fewer days per week, your first eligible date moves out accordingly — which is exactly what the "trading days per week" input adjusts for here.',
+  },
+];
+---
+
+<Tool
+  title="Payout Withdrawal Date Calculator"
+  metaTitle="Prop Firm Payout & Withdrawal Date Calculator"
+  description="Estimate your first eligible withdrawal date and upcoming payout dates from your funded start date, minimum trading days and payout cycle length."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="pw-start">Funded start date</label>
+        <input type="date" id="pw-start" value="2026-08-20" />
+      </div>
+      <div class="tool-field">
+        <label for="pw-mindays">Minimum trading days required</label>
+        <input type="number" id="pw-mindays" value="5" step="1" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="pw-perweek">Trading days per week</label>
+        <input type="number" id="pw-perweek" value="5" step="1" min="1" max="7" />
+      </div>
+      <div class="tool-field">
+        <label for="pw-cycle">Payout cycle (days)</label>
+        <input type="number" id="pw-cycle" value="14" step="1" min="1" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="pw-calc">Calculate dates</button>
+    </div>
+    <div class="tool-results" id="pw-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Minimum days met by</div>
+          <div class="value" id="pw-mindate">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">First eligible withdrawal</div>
+          <div class="value" id="pw-firstdate">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Days from funded</div>
+          <div class="value" id="pw-daysout">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Then every</div>
+          <div class="value" id="pw-cadence">—</div>
+        </div>
+      </div>
+      <div id="pw-schedule" style="margin-top:1rem"></div>
+      <p class="tool-note">
+        Estimate only. Assumes trading days accrue evenly across your trading week and the first
+        payout lands on the first cycle boundary after eligibility. Complete KYC on day one and keep
+        your best day under any consistency cap so nothing defers the estimated date.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Why the wait is longer than the transfer</h2>
+    <p>
+      Traders picture the payout as a bank transfer, but the transfer is the fast part. The real
+      wait is the two clocks in front of it: the minimum trading days you must accumulate, and the
+      payout cycle you have to reach. This tool makes both visible so your first request lands when
+      it's actually valid — not days early, where it just gets rejected.
+    </p>
+    <p>
+      For everything that can still delay a payout after you're eligible — consistency deferrals,
+      KYC, buffers — read <a href="/guides/how-long-do-prop-firm-payouts-take/">how long prop firm
+      payouts take</a> and the <a href="/guides/prop-firm-payout-methods/">payout methods guide</a>.
+      Check your best-day ratio won't defer you with the
+      <a href="/tools/consistency-rule-calculator/">consistency rule calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const fmt = (d: Date) =>
+      d.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    const addDays = (d: Date, n: number) => {
+      const r = new Date(d.getTime());
+      r.setDate(r.getDate() + n);
+      return r;
+    };
+
+    document.getElementById('pw-calc')!.addEventListener('click', () => {
+      const startVal = $('pw-start').value;
+      if (!startVal) return;
+      const start = new Date(startVal + 'T00:00:00');
+      const minDays = Math.max(0, parseInt($('pw-mindays').value) || 0);
+      const perWeek = Math.max(1, Math.min(7, parseInt($('pw-perweek').value) || 5));
+      const cycle = Math.max(1, parseInt($('pw-cycle').value) || 14);
+
+      // Calendar days to accumulate the minimum trading days at `perWeek` days/week.
+      const fullWeeks = Math.floor(minDays / perWeek);
+      const remainder = minDays - fullWeeks * perWeek;
+      const calendarToMin = minDays === 0 ? 0 : fullWeeks * 7 + Math.max(0, remainder - 1);
+      const minDate = addDays(start, calendarToMin);
+
+      // First payout = first cycle boundary at or after the minimum-days date.
+      const cyclesToFirst = Math.max(1, Math.ceil(calendarToMin / cycle));
+      const firstDate = addDays(start, cyclesToFirst * cycle);
+      const daysOut = Math.round((firstDate.getTime() - start.getTime()) / 86400000);
+
+      document.getElementById('pw-mindate')!.textContent = fmt(minDate);
+      document.getElementById('pw-firstdate')!.textContent = fmt(firstDate);
+      document.getElementById('pw-daysout')!.textContent = daysOut + ' days';
+      document.getElementById('pw-cadence')!.textContent = cycle + ' days';
+
+      let sched = '<table><thead><tr><th>Payout</th><th>Date</th></tr></thead><tbody>';
+      for (let i = 0; i < 4; i++) {
+        const d = addDays(firstDate, i * cycle);
+        sched += '<tr><td>#' + (i + 1) + '</td><td>' + fmt(d) + '</td></tr>';
+      }
+      sched += '</tbody></table>';
+      document.getElementById('pw-schedule')!.innerHTML = sched;
+
+      document.getElementById('pw-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

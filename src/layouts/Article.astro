@@ -1,9 +1,9 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { getCollection } from 'astro:content';
 import Base from './Base.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import { AUTHOR, CATEGORIES, SITE } from '../consts';
+import { livePosts } from '../publish';
 
 interface Props {
   entry: CollectionEntry<'articles'>;
@@ -77,10 +77,10 @@ schema.push({
 });
 
 // --- related articles (same category, newest first) ------------------------
-const all = await getCollection('articles', ({ data }) => !data.draft);
+// Only already-published posts — never link to scheduled/future content.
+const all = await livePosts();
 const related = all
   .filter((a) => a.id !== entry.id && a.data.category === category)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
 const initials = AUTHOR.name

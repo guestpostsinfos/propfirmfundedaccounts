@@ -1,0 +1,142 @@
+---
+import Tool from '../../layouts/Tool.astro';
+import { beforePublish } from '../../publish';
+
+// Scheduled publish — hidden until the date; the daily rebuild flips it live.
+if (beforePublish('2026-08-27T00:00:00Z')) return Astro.redirect('/tools/');
+
+const faqs = [
+  {
+    q: 'How much profit do I need to recoup my challenge fee?',
+    a: 'Because you only keep your split of the profit, the gross profit needed to recover a fee is the fee divided by your split. On an 80% split, a $500 fee needs $625 in gross profit for your take-home to equal the fee. This tool shows that figure in dollars and as a percentage of your funded account.',
+  },
+  {
+    q: 'What if my challenge fee is refunded on the first payout?',
+    a: 'Many firms refund the evaluation fee with your first payout. When that applies, your break-even point arrives as soon as you qualify for any payout — the fee comes back on top of your split of the profits — so your effective cost of getting funded drops to zero once you\'re paid. This calculator lets you toggle the refund to see both cases.',
+  },
+  {
+    q: 'Why does the split make the fee cost more to recover?',
+    a: 'Because the firm keeps a slice of every dollar you make. If you keep 80%, then 20% of your gross profit goes to the firm, so you must generate more gross profit than the fee itself for your share to match it. The lower your split, the more gross profit each dollar of fee requires — one reason a headline split matters to real cost.',
+  },
+  {
+    q: 'Is the challenge fee the true cost of getting funded?',
+    a: 'No — the true cost also accounts for how many attempts you are likely to need. A single fee understates cost if your realistic pass rate means multiple attempts. Use the true challenge cost calculator for expected total spend, then use this tool to see how much you must earn to recover whatever you actually paid.',
+  },
+];
+---
+
+<Tool
+  title="Challenge Fee Recovery Calculator"
+  metaTitle="Prop Firm Challenge Fee Recovery Calculator"
+  description="How much profit you must earn — and at what account return — to recoup your challenge fee after the profit split, with or without a first-payout fee refund."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="fr-fee">Challenge fee paid ($)</label>
+        <input type="number" id="fr-fee" value="500" step="10" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="fr-account">Funded account size ($)</label>
+        <input type="number" id="fr-account" value="100000" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="fr-split">Your profit split (%)</label>
+        <input type="number" id="fr-split" value="80" step="1" min="1" max="100" />
+      </div>
+      <div class="tool-field">
+        <label for="fr-refund">Fee refunded on first payout?</label>
+        <select id="fr-refund">
+          <option value="no" selected>No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="fr-calc">Calculate recovery</button>
+    </div>
+    <div class="tool-results" id="fr-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Gross profit to recoup fee</div>
+          <div class="value" id="fr-gross">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">As account return</div>
+          <div class="value" id="fr-pct">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Take-home at that point</div>
+          <div class="value" id="fr-take">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Effective cost of funding</div>
+          <div class="value" id="fr-effective">—</div>
+        </div>
+      </div>
+      <p id="fr-comment" style="margin-top:1rem; font-weight:600"></p>
+      <p class="tool-note">
+        Gross profit to recoup = fee ÷ split. With a first-payout refund, the fee returns on top of
+        your split, so break-even arrives as soon as you qualify for any payout. This covers one
+        attempt — for expected spend across realistic pass rates, use the true cost calculator.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>The split makes your fee cost more than it looks</h2>
+    <p>
+      A $500 fee doesn't need $500 of profit to recover — it needs $500 of <em>take-home</em>, and
+      you only keep your split of what you make. At 80%, that's $625 of gross profit before you're
+      square; at a lower split, more. Seeing that number as a percentage of your account turns an
+      abstract fee into a concrete first target: the return you need just to get back to zero.
+    </p>
+    <p>
+      If your firm refunds the fee on the first payout, the picture changes completely — your
+      effective cost of getting funded drops to zero once you're paid, which is a real edge worth
+      factoring into <a href="/best/best-prop-firms/">firm choice</a>. For the bigger question of
+      total spend across multiple attempts, use the
+      <a href="/tools/challenge-cost-calculator/">true challenge cost calculator</a>, and confirm your
+      take-home per payout with the <a href="/tools/profit-split-calculator/">profit split
+      calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) => '$' + Math.round(n).toLocaleString();
+
+    document.getElementById('fr-calc')!.addEventListener('click', () => {
+      const fee = parseFloat($('fr-fee').value) || 0;
+      const account = parseFloat($('fr-account').value) || 0;
+      const split = (parseFloat($('fr-split').value) || 0) / 100;
+      const refunded = ($('fr-refund') as unknown as HTMLSelectElement).value === 'yes';
+
+      if (account <= 0 || split <= 0) return;
+
+      const gross = fee / split;
+      const pct = (gross / account) * 100;
+      const takeHome = gross * split; // equals fee by construction
+
+      document.getElementById('fr-gross')!.textContent = usd(gross);
+      document.getElementById('fr-pct')!.textContent = pct.toFixed(2) + '%';
+      document.getElementById('fr-take')!.textContent = usd(takeHome);
+      document.getElementById('fr-effective')!.textContent = refunded ? '$0 (refunded)' : usd(fee);
+
+      const comment = document.getElementById('fr-comment')!;
+      if (refunded) {
+        comment.textContent =
+          '✓ With the fee refunded on first payout, your effective cost of funding is $0 once paid — and every dollar of the ' +
+          usd(gross) + ' gross above is pure take-home on top.';
+      } else {
+        comment.textContent =
+          'You need a ' + pct.toFixed(2) + '% account return (' + usd(gross) +
+          ' gross) just to break even on the fee. Anything past that is real profit at your ' +
+          (split * 100).toFixed(0) + '% split.';
+      }
+
+      document.getElementById('fr-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

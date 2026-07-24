@@ -1,39 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../consts';
+import { TOOLS, toolIsLive } from '../../tools.mjs';
 
-const tools = [
-  {
-    href: '/tools/position-size-calculator/',
-    title: 'Position Size Calculator',
-    desc: 'Lot size from account, risk % and stop distance — with prop-firm-safe presets for forex, gold and indices.',
-  },
-  {
-    href: '/tools/challenge-pass-simulator/',
-    title: 'Challenge Pass Probability Simulator',
-    desc: 'Monte Carlo simulation of your win rate, risk:reward and sizing against real challenge rules — see your true pass odds before you pay.',
-  },
-  {
-    href: '/tools/drawdown-calculator/',
-    title: 'Drawdown & Breach Calculator',
-    desc: 'Exactly how much room you have left before a daily or max drawdown breach — static and trailing modes.',
-  },
-  {
-    href: '/tools/challenge-cost-calculator/',
-    title: 'True Challenge Cost Calculator',
-    desc: 'Expected total spend to get funded based on fee and realistic pass rates — the number sticker prices hide.',
-  },
-  {
-    href: '/tools/profit-split-calculator/',
-    title: 'Profit Split & Payout Calculator',
-    desc: 'Your real take-home from a payout: split tiers, fee refunds and effective return on your challenge fee.',
-  },
-  {
-    href: '/tools/consistency-rule-calculator/',
-    title: 'Consistency Rule Calculator',
-    desc: 'Check your best day against your firm\'s consistency cap — pass/fail and the exact extra profit needed before a compliant payout.',
-  },
-];
+const tools = TOOLS.filter((t) => toolIsLive(t));
 
 const schema = [
   {
@@ -50,7 +20,7 @@ const schema = [
 
 <Base
   title={`Free Prop Firm Calculators & Tools | ${SITE.name}`}
-  description="Six free calculators built for prop firm traders: position sizing, challenge pass probability (Monte Carlo), drawdown breach room, true challenge cost, payout splits and consistency-rule checking."
+  description="Free calculators built for prop firm traders: position sizing, challenge pass probability (Monte Carlo), drawdown breach room, true challenge cost, payout splits, consistency-rule checking and more — no signup."
   schema={schema}
 >
   <div class="wrap">

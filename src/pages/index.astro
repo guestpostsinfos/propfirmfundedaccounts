@@ -1,14 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import { SITE } from '../consts';
+import { livePosts } from '../publish';
 
-const articles = (await getCollection('articles', ({ data }) => !data.draft)).sort(
-  (a, b) =>
-    (b.data.updatedDate ?? b.data.pubDate).valueOf() -
-    (a.data.updatedDate ?? a.data.pubDate).valueOf()
-);
+const articles = await livePosts();
 
 const reviews = articles.filter((a) => a.data.category === 'reviews').slice(0, 3);
 const guides = articles.filter((a) => a.data.category === 'guides').slice(0, 3);
@@ -62,7 +58,7 @@ const latest = articles.slice(0, 6);
         <p>Your exact breach prices for daily and max drawdown — static and trailing modes.</p>
       </li>
     </ul>
-    <p><a href="/tools/">All five tools →</a></p>
+    <p><a href="/tools/">See all free tools →</a></p>
   </section>
 
   <section class="wrap">

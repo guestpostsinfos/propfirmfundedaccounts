@@ -1,0 +1,46 @@
+name: Scheduled publish (daily rebuild)
+
+# Content and tools with a future date are committed now but stay hidden until
+# their date arrives. A static site only reflects that when it is rebuilt, so
+# this workflow triggers a fresh Cloudflare Pages build once a day. The build
+# re-evaluates every pubDate / publishDate and any newly-due item goes live —
+# no manual push required.
+#
+# ── One-time setup ─────────────────────────────────────────────────────────
+# 1. Cloudflare dashboard → Workers & Pages → your Pages project → Settings →
+#    Builds & deployments → Deploy hooks → "Add deploy hook"
+#    (name: "daily-scheduled-publish", branch: main). Copy the URL.
+# 2. GitHub repo → Settings → Secrets and variables → Actions → New repository
+#    secret → name: CF_DEPLOY_HOOK, value: the URL from step 1.
+# That's it. You can also press "Run workflow" here anytime to publish on demand.
+
+on:
+  schedule:
+    # 06:15 UTC daily. Cron on GitHub is UTC and best-effort (may lag a few min).
+    - cron: '15 6 * * *'
+  workflow_dispatch: {}
+
+# Avoid overlapping runs if a previous one is still going.
+concurrency:
+  group: scheduled-publish
+  cancel-in-progress: false
+
+jobs:
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages deploy
+        env:
+          HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::CF_DEPLOY_HOOK secret is not set. See setup notes at the top of this file."
+            exit 1
+          fi
+          echo "Triggering daily rebuild…"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
+          echo "Deploy hook responded with HTTP $code"
+          case "$code" in
+            2*) echo "Rebuild queued successfully." ;;
+            *)  echo "::error::Deploy hook failed (HTTP $code)."; exit 1 ;;
+          esac

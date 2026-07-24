@@ -1,0 +1,140 @@
+---
+import Tool from '../../layouts/Tool.astro';
+import { beforePublish } from '../../publish';
+
+// Scheduled publish — hidden until the date; the daily rebuild flips it live.
+if (beforePublish('2026-08-13T00:00:00Z')) return Astro.redirect('/tools/');
+
+const faqs = [
+  {
+    q: 'What is trading expectancy?',
+    a: 'Expectancy is the average profit or loss you can expect per trade over a large sample, given your win rate and your average win and loss sizes. The formula is (win rate × average win) − (loss rate × average loss). A positive number means your strategy makes money over time; a negative number means it loses, no matter how disciplined you are.',
+  },
+  {
+    q: 'What is a good expectancy value?',
+    a: 'Any positive expectancy is an edge, but the useful way to read it is per unit of risk (R). An expectancy of +0.3R means you net 0.3 times your risk per trade on average — over 100 trades that compounds meaningfully. The higher the R-expectancy, the fewer trades you need for your edge to overcome variance and prop firm drawdown.',
+  },
+  {
+    q: 'Can I pass a prop firm challenge with negative expectancy?',
+    a: 'Occasionally, by luck — but not repeatably. Negative expectancy means the math is against you, so even if variance lets you pass once, funded trading over many trades will grind the account down. Prop firm rules (targets, drawdown, consistency) are designed to filter out exactly this: they reward a real, positive edge and expose a negative one over time.',
+  },
+  {
+    q: 'How many trades before expectancy is reliable?',
+    a: 'Expectancy from a handful of trades is mostly noise. A rough working minimum is 30–50 trades to see a signal and 100+ before you should trust the number, because a few large wins or losses distort small samples. Compute it from your real journal over as many trades as you have, and recompute as the sample grows.',
+  },
+];
+---
+
+<Tool
+  title="Trading Expectancy Calculator"
+  metaTitle="Trading Expectancy Calculator (Edge Per Trade)"
+  description="Your expected profit per trade from win rate and average win/loss — in dollars and R multiples — so you know whether your edge is positive before prop firm rules test it."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="ex-win">Win rate (%)</label>
+        <input type="number" id="ex-win" value="50" step="1" min="0" max="100" />
+      </div>
+      <div class="tool-field">
+        <label for="ex-avgwin">Average win ($)</label>
+        <input type="number" id="ex-avgwin" value="300" step="10" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="ex-avgloss">Average loss ($)</label>
+        <input type="number" id="ex-avgloss" value="200" step="10" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="ex-trades">Trades per month (for projection)</label>
+        <input type="number" id="ex-trades" value="40" step="5" min="1" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="ex-calc">Calculate expectancy</button>
+    </div>
+    <div class="tool-results" id="ex-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Expectancy / trade</div>
+          <div class="value" id="ex-per">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Expectancy (R)</div>
+          <div class="value" id="ex-r">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Per 100 trades</div>
+          <div class="value" id="ex-100">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Projected / month</div>
+          <div class="value" id="ex-month">—</div>
+        </div>
+      </div>
+      <p id="ex-comment" style="margin-top:1rem; font-weight:600"></p>
+      <p class="tool-note">
+        Expectancy = (win rate × average win) − (loss rate × average loss). Reward-to-risk (R) is
+        average win ÷ average loss. Use real numbers from your journal over 100+ trades for a
+        reliable read — small samples are dominated by a few outlier trades.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>The one number that says whether you have an edge</h2>
+    <p>
+      Win rate alone tells you nothing — a 30% win rate can be highly profitable with big winners,
+      and a 70% win rate can lose money if the losses are large enough. Expectancy combines both into
+      a single verdict: positive means you make money over time, negative means you don't, and no
+      amount of discipline fixes a negative edge. Fix the strategy first; size it second.
+    </p>
+    <p>
+      Once your expectancy is positive, the questions become survival and sizing: will a normal
+      losing streak breach you before the edge compounds? Test that with the
+      <a href="/tools/risk-of-ruin-calculator/">risk of ruin calculator</a> and your challenge odds
+      with the <a href="/tools/challenge-pass-simulator/">pass simulator</a>, then translate your risk
+      into lot size with the <a href="/tools/position-size-calculator/">position size calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) =>
+      (n >= 0 ? '+$' : '−$') + Math.abs(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+    document.getElementById('ex-calc')!.addEventListener('click', () => {
+      const p = (parseFloat($('ex-win').value) || 0) / 100;
+      const avgWin = parseFloat($('ex-avgwin').value) || 0;
+      const avgLoss = parseFloat($('ex-avgloss').value) || 0;
+      const perMonth = parseFloat($('ex-trades').value) || 0;
+
+      if (avgLoss <= 0 && avgWin <= 0) return;
+
+      const expectancy = p * avgWin - (1 - p) * avgLoss;
+      const rMultiple = avgLoss > 0 ? avgWin / avgLoss : 0;
+      const expectancyR = avgLoss > 0 ? p * rMultiple - (1 - p) : 0;
+
+      document.getElementById('ex-per')!.textContent = usd(expectancy);
+      document.getElementById('ex-r')!.textContent =
+        (expectancyR >= 0 ? '+' : '') + expectancyR.toFixed(2) + 'R';
+      document.getElementById('ex-100')!.textContent = usd(expectancy * 100);
+      document.getElementById('ex-month')!.textContent = usd(expectancy * perMonth);
+
+      const comment = document.getElementById('ex-comment')!;
+      if (expectancy > 0) {
+        comment.textContent =
+          '✓ Positive edge: you net ' + usd(expectancy) + ' per trade on average (' +
+          expectancyR.toFixed(2) + 'R). Protect it with disciplined sizing so variance can\'t breach you first.';
+      } else if (expectancy === 0) {
+        comment.textContent =
+          'Break-even edge: costs and slippage will tip this negative. Improve win rate or reward-to-risk before trading it live.';
+      } else {
+        comment.textContent =
+          '⚠ Negative edge: this strategy loses ' + usd(expectancy) + ' per trade over time. No sizing or discipline fixes a losing edge — rework the strategy first.';
+      }
+
+      document.getElementById('ex-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

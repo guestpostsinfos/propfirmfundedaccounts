@@ -1,9 +1,10 @@
 // One-off SEO audit over the built dist/ output. Not part of the site.
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { TOOLS, toolIsLive } from './src/tools.mjs';
 
 const DIST = new URL('./dist/', import.meta.url).pathname.replace(/^\//, '');
-const pages = [];
+let pages = [];
 
 async function walk(dir) {
   for (const e of await readdir(dir, { withFileTypes: true })) {
@@ -21,6 +22,15 @@ const routeOf = (file) => {
   if (!r.endsWith('/')) r = r.replace(/\.html$/, '/');
   return r;
 };
+
+// Exclude scheduled (not-yet-live) tool pages — their redirect stubs are not
+// "published" yet, so they shouldn't count against schema/H1/orphan checks.
+// In PREVIEW_SCHEDULED mode, audit the full future graph instead.
+const preview = process.env.PREVIEW_SCHEDULED === '1';
+const hiddenTools = preview
+  ? new Set()
+  : new Set(TOOLS.filter((t) => !toolIsLive(t)).map((t) => t.href));
+pages = pages.filter((f) => !hiddenTools.has(routeOf(f)));
 
 const routes = new Set(pages.map(routeOf));
 const contents = new Map();

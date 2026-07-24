@@ -1,0 +1,157 @@
+---
+import Tool from '../../layouts/Tool.astro';
+import { beforePublish } from '../../publish';
+
+// Scheduled publish — hidden until the date; the daily rebuild flips it live.
+if (beforePublish('2026-07-30T00:00:00Z')) return Astro.redirect('/tools/');
+
+const faqs = [
+  {
+    q: 'How does a prop firm scaling plan grow my account?',
+    a: 'Most plans raise your funded balance by a set increment (often around 25%) each time you hit a profit milestone over a minimum period without breaching. Many also raise your profit split at each tier. This calculator compounds both so you can see the realistic balance and take-home after several milestones — not a single lucky month.',
+  },
+  {
+    q: 'Is the projected balance real money?',
+    a: 'No. The scaled balance is virtual buying power the firm allocates at its own risk — you never deposit or withdraw it. What you keep is your profit split on the gains you make trading that larger balance, which is the "take-home" figure this tool projects.',
+  },
+  {
+    q: 'Why does the take-home compound faster than the balance?',
+    a: 'Because scaling often raises two things at once: your capital and your split percentage. A higher split on a larger balance means each milestone\'s take-home grows on two axes, so cumulative take-home accelerates faster than the balance alone.',
+  },
+  {
+    q: 'What resets scaling progress?',
+    a: 'A rule breach resets it at every firm — you lose the account and all progress. Some firms also pause or reset the scaling clock after a losing period even without a breach. This projection assumes you hit each milestone without breaching, so treat it as a best-case path, not a guarantee.',
+  },
+];
+---
+
+<Tool
+  title="Scaling Plan Projection Calculator"
+  metaTitle="Prop Firm Scaling Plan Projection Calculator (Balance & Take-Home)"
+  description="Project how your funded balance and take-home grow across scaling milestones — capital and profit-split compounding together over several tiers."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="sp-start">Starting funded balance ($)</label>
+        <input type="number" id="sp-start" value="100000" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-target">Profit per milestone (%)</label>
+        <input type="number" id="sp-target" value="10" step="0.5" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-capinc">Capital increase per milestone (%)</label>
+        <input type="number" id="sp-capinc" value="25" step="5" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-split">Starting profit split (%)</label>
+        <input type="number" id="sp-split" value="80" step="1" min="1" max="100" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-splitinc">Split increase per milestone (points)</label>
+        <input type="number" id="sp-splitinc" value="2.5" step="0.5" min="0" />
+      </div>
+      <div class="tool-field">
+        <label for="sp-milestones">Milestones to project</label>
+        <input type="number" id="sp-milestones" value="4" step="1" min="1" max="12" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="sp-calc">Project scaling</button>
+    </div>
+    <div class="tool-results" id="sp-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Final funded balance</div>
+          <div class="value" id="sp-finalbal">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Cumulative take-home</div>
+          <div class="value" id="sp-takehome">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Final profit split</div>
+          <div class="value" id="sp-finalsplit">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Milestones reached</div>
+          <div class="value" id="sp-count">—</div>
+        </div>
+      </div>
+      <div id="sp-table" style="overflow-x:auto; margin-top:1rem"></div>
+      <p class="tool-note">
+        Best-case projection assuming you hit each milestone without breaching. Real scaling depends
+        on your firm's exact profit trigger, time floor and whether the plan resets on a losing
+        period. The scaled balance is virtual buying power, not withdrawable cash.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>What this projection really shows</h2>
+    <p>
+      Scaling compounds on two axes at once: your capital grows and, at many firms, your profit
+      split grows with it. That's why the cumulative take-home accelerates faster than the balance —
+      a higher percentage of a larger number. Traders who underrate scaling look only at the balance
+      increase and miss the split growth stacked on top of it.
+    </p>
+    <p>
+      Treat the result as the best case, not a promise. Every milestone here assumes you hit the
+      profit target without a breach, and a single breached
+      <a href="/tools/drawdown-calculator/">drawdown</a> resets the whole path. Read how the
+      milestones actually work — and what resets them — in the
+      <a href="/guides/prop-firm-scaling-plans-explained/">scaling plans guide</a>, then confirm your
+      real take-home per payout with the
+      <a href="/tools/profit-split-calculator/">profit split calculator</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+    const usd = (n: number) => '$' + Math.round(n).toLocaleString();
+
+    document.getElementById('sp-calc')!.addEventListener('click', () => {
+      let balance = parseFloat($('sp-start').value) || 0;
+      const target = (parseFloat($('sp-target').value) || 0) / 100;
+      const capInc = (parseFloat($('sp-capinc').value) || 0) / 100;
+      let split = parseFloat($('sp-split').value) || 80;
+      const splitInc = parseFloat($('sp-splitinc').value) || 0;
+      const n = Math.max(1, Math.min(12, parseInt($('sp-milestones').value) || 1));
+
+      if (balance <= 0) return;
+
+      let cumTakeHome = 0;
+      let rows =
+        '<table><thead><tr><th>Milestone</th><th>Balance</th><th>Split</th>' +
+        '<th>Profit made</th><th>Take-home</th><th>Cumulative</th></tr></thead><tbody>';
+
+      for (let i = 1; i <= n; i++) {
+        const profit = balance * target;
+        const takeHome = profit * (split / 100);
+        cumTakeHome += takeHome;
+        rows +=
+          '<tr><td>' + i + '</td><td>' + usd(balance) + '</td><td>' + split.toFixed(1) +
+          '%</td><td>' + usd(profit) + '</td><td>' + usd(takeHome) + '</td><td>' +
+          usd(cumTakeHome) + '</td></tr>';
+        // Advance to next tier.
+        balance = balance * (1 + capInc);
+        split = Math.min(100, split + splitInc);
+      }
+      rows += '</tbody></table>';
+
+      // After the loop, `balance` and `split` reflect the tier you'd start next.
+      const finalBalance = balance / (1 + capInc); // balance during last milestone
+      const finalSplit = Math.min(100, split - splitInc);
+
+      document.getElementById('sp-finalbal')!.textContent = usd(finalBalance);
+      document.getElementById('sp-takehome')!.textContent = usd(cumTakeHome);
+      document.getElementById('sp-finalsplit')!.textContent = finalSplit.toFixed(1) + '%';
+      document.getElementById('sp-count')!.textContent = String(n);
+      document.getElementById('sp-table')!.innerHTML = rows;
+
+      document.getElementById('sp-results')!.classList.add('show');
+    });
+  </script>
+</Tool>

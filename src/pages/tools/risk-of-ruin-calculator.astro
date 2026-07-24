@@ -1,0 +1,162 @@
+---
+import Tool from '../../layouts/Tool.astro';
+import { beforePublish } from '../../publish';
+
+// Scheduled publish — hidden until the date; the daily rebuild flips it live.
+if (beforePublish('2026-08-06T00:00:00Z')) return Astro.redirect('/tools/');
+
+const faqs = [
+  {
+    q: 'What is risk of ruin in prop trading?',
+    a: 'Risk of ruin is the probability that a losing streak drives your account down to a hard limit — here, your prop firm max drawdown — before you reach your goal. It depends on your win rate, your reward-to-risk ratio and how much you risk per trade. Even a profitable strategy can have an uncomfortably high risk of ruin if you size too aggressively.',
+  },
+  {
+    q: 'How is this risk of ruin calculated?',
+    a: 'This tool runs a Monte Carlo simulation: thousands of random trade sequences using your win rate and reward-to-risk, tracking peak-to-current drawdown, and counting how often that drawdown reaches your max limit within the trade horizon. The result is the share of simulated runs that breached — your risk of ruin for that sizing.',
+  },
+  {
+    q: 'What is an acceptable risk of ruin?',
+    a: 'Lower is always better; many professionals aim to keep it in low single digits. A double-digit risk of ruin means a normal, expected losing streak has a meaningful chance of ending your account before your edge plays out. The usual fix is not a better strategy but smaller risk per trade — halving your risk typically cuts risk of ruin sharply.',
+  },
+  {
+    q: 'Does a positive expectancy guarantee I won\'t be ruined?',
+    a: 'No. A positive edge means you win over a large enough sample, but variance still produces losing streaks in the short run. If your risk per trade is large relative to your drawdown limit, one of those streaks can breach you before the edge compounds. Expectancy tells you the long-run direction; risk of ruin tells you the odds of not surviving to get there.',
+  },
+];
+---
+
+<Tool
+  title="Risk of Ruin Calculator"
+  metaTitle="Prop Firm Risk of Ruin Calculator (Monte Carlo)"
+  description="The probability your win rate and risk-per-trade breach your max drawdown before you pass — a Monte Carlo simulation that decides your safe position size."
+  faqs={faqs}
+>
+  <div class="tool-card">
+    <div class="tool-grid">
+      <div class="tool-field">
+        <label for="rr-win">Win rate (%)</label>
+        <input type="number" id="rr-win" value="45" step="1" min="1" max="99" />
+      </div>
+      <div class="tool-field">
+        <label for="rr-rr">Reward : risk (avg win ÷ avg loss)</label>
+        <input type="number" id="rr-rr" value="2" step="0.1" min="0.1" />
+      </div>
+      <div class="tool-field">
+        <label for="rr-risk">Risk per trade (% of account)</label>
+        <input type="number" id="rr-risk" value="1" step="0.25" min="0.1" />
+      </div>
+      <div class="tool-field">
+        <label for="rr-dd">Max drawdown limit (%)</label>
+        <input type="number" id="rr-dd" value="10" step="0.5" min="1" />
+      </div>
+      <div class="tool-field">
+        <label for="rr-horizon">Trade horizon</label>
+        <input type="number" id="rr-horizon" value="200" step="10" min="10" max="2000" />
+      </div>
+    </div>
+    <div class="tool-actions">
+      <button id="rr-calc">Run simulation</button>
+    </div>
+    <div class="tool-results" id="rr-results">
+      <div class="result-grid">
+        <div class="result-stat warn">
+          <div class="label">Risk of ruin</div>
+          <div class="value" id="rr-ror">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Expectancy / trade</div>
+          <div class="value" id="rr-exp">—</div>
+        </div>
+        <div class="result-stat">
+          <div class="label">Survival rate</div>
+          <div class="value" id="rr-survive">—</div>
+        </div>
+        <div class="result-stat warn">
+          <div class="label">Risk per trade</div>
+          <div class="value" id="rr-riskout">—</div>
+        </div>
+      </div>
+      <p id="rr-comment" style="margin-top:1rem; font-weight:600"></p>
+      <p class="tool-note">
+        Monte Carlo of 10,000 runs over your trade horizon. "Ruin" = peak-to-current drawdown
+        reaches your max limit. Real trading adds slippage, correlation and psychology this model
+        can't capture, so treat the result as a sizing guide, not a promise.
+      </p>
+    </div>
+  </div>
+
+  <article class="article-body">
+    <h2>Why sizing, not strategy, usually decides survival</h2>
+    <p>
+      Two traders with the identical edge can have wildly different outcomes: the one who risks 0.5%
+      per trade survives the losing streaks that breach the one risking 2%. Risk of ruin is where
+      that shows up as a number. If yours is in double digits, the answer is almost never a better
+      strategy — it's smaller risk per trade. Halve your risk and watch the figure collapse.
+    </p>
+    <p>
+      Pair this with the <a href="/tools/challenge-pass-simulator/">challenge pass simulator</a> to
+      see the other side of the same coin — the odds of reaching a target before breaching — and use
+      the <a href="/tools/position-size-calculator/">position size calculator</a> to turn your chosen
+      risk percentage into an exact lot size. The mechanics of the drawdown limit you're testing
+      against are in <a href="/guides/prop-firm-drawdown-explained/">drawdown rules explained</a>.
+    </p>
+  </article>
+
+  <script>
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+
+    document.getElementById('rr-calc')!.addEventListener('click', () => {
+      const p = (parseFloat($('rr-win').value) || 0) / 100;
+      const rr = parseFloat($('rr-rr').value) || 0;
+      const risk = parseFloat($('rr-risk').value) || 0;
+      const maxDD = parseFloat($('rr-dd').value) || 0;
+      const horizon = Math.max(10, Math.min(2000, parseInt($('rr-horizon').value) || 200));
+
+      if (p <= 0 || rr <= 0 || risk <= 0 || maxDD <= 0) return;
+
+      const win = rr * risk; // % gained on a win
+      const loss = risk; // % lost on a loss
+      const SIMS = 10000;
+      let ruined = 0;
+
+      for (let s = 0; s < SIMS; s++) {
+        let pnl = 0;
+        let peak = 0;
+        for (let t = 0; t < horizon; t++) {
+          pnl += Math.random() < p ? win : -loss;
+          if (pnl > peak) peak = pnl;
+          if (peak - pnl >= maxDD) {
+            ruined++;
+            break;
+          }
+        }
+      }
+
+      const ror = (ruined / SIMS) * 100;
+      const expectancy = p * win - (1 - p) * loss; // % per trade
+
+      document.getElementById('rr-ror')!.textContent = ror.toFixed(1) + '%';
+      document.getElementById('rr-exp')!.textContent =
+        (expectancy >= 0 ? '+' : '') + expectancy.toFixed(2) + '%';
+      document.getElementById('rr-survive')!.textContent = (100 - ror).toFixed(1) + '%';
+      document.getElementById('rr-riskout')!.textContent = risk.toFixed(2) + '%';
+
+      const comment = document.getElementById('rr-comment')!;
+      if (expectancy <= 0) {
+        comment.textContent =
+          '⚠ Negative expectancy — this edge loses over time regardless of sizing. Fix the strategy before the size.';
+      } else if (ror >= 20) {
+        comment.textContent =
+          '⚠ High risk of ruin (' + ror.toFixed(0) + '%). Your edge is positive but your size is too big for this drawdown — try halving risk per trade.';
+      } else if (ror >= 5) {
+        comment.textContent =
+          'Moderate risk of ruin. Survivable, but reducing risk per trade would meaningfully improve your odds of lasting the horizon.';
+      } else {
+        comment.textContent =
+          '✓ Low risk of ruin. This sizing gives your positive edge room to play out across a normal losing streak.';
+      }
+
+      document.getElementById('rr-results')!.classList.add('show');
+    });
+  </script>
+</Tool>
