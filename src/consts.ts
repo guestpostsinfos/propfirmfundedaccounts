@@ -22,6 +22,7 @@ export const AUTHOR = {
 } as const;
 
 export const NAV = [
+  { label: 'Learn', href: '/learn/' },
   { label: 'Best Prop Firms', href: '/best/best-prop-firms/' },
   { label: 'Reviews', href: '/reviews/' },
   { label: 'Comparisons', href: '/compare/' },

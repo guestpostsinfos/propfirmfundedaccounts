@@ -1,0 +1,802 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+
+const url = `${SITE.url}/learn/`;
+
+const faqs = [
+  {
+    q: 'How do I learn prop firm trading as a beginner?',
+    a: 'Start with the fundamentals — what a prop firm is and how the funded model works — then learn the rules that actually breach accounts (drawdown and consistency), then risk management and psychology, and finally payouts and scaling. This free course follows exactly that beginner-to-advanced path and personalises every example to your firm, account type and account size.',
+  },
+  {
+    q: 'Can I learn prop firm trading for free?',
+    a: 'Yes. This is a completely free, no-signup prop firm trading course. It covers everything from the basics of proprietary trading to advanced scaling, with interactive slides, diagrams and quizzes, plus free calculators to apply what you learn to your own account.',
+  },
+  {
+    q: 'How long does it take to learn prop firm trading?',
+    a: 'You can learn the core concepts — the funded model, the rules, risk management and payouts — in a few focused hours, and this course is built to take you through them in roughly that time. Mastering execution and passing consistently, however, takes months of disciplined practice; understanding the rules is the fast part, and applying them under pressure is the real skill.',
+  },
+  {
+    q: 'What should a prop trading beginner learn first?',
+    a: 'Drawdown rules. More funded accounts fail to drawdown mechanics — daily loss limits and trailing drawdown — than to anything else, so understanding your exact breach levels before your first trade is the single highest-value thing a beginner can learn. This course covers it in Module 3, right after the fundamentals.',
+  },
+  {
+    q: 'Is prop firm trading hard to learn?',
+    a: 'The concepts are genuinely simple — the rules are arithmetic and the model is straightforward. What is hard is the discipline: sizing conservatively, respecting a personal daily stop, and not chasing targets. Most traders fail on psychology and risk management, not on a lack of knowledge, which is why this course spends as much time on discipline as on the rules.',
+  },
+  {
+    q: 'Do I need trading experience to start a prop firm challenge?',
+    a: 'You need a tested, positive-expectancy trading method before you pay for a challenge — prop firms fund existing skill, they do not teach it. If you are still building a strategy, learn the rules and risk management here first, practise on a demo until your method is consistently profitable, and only then buy an evaluation. Starting a challenge without a proven edge just funds a loss.',
+  },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: 'Learn Prop Firm Trading: Beginner to Advanced',
+    description:
+      'A free, interactive prop firm trading course covering the funded model, evaluation rules, drawdown, risk management, psychology, payouts and scaling — personalised to your firm, account type and account size.',
+    url,
+    provider: { '@id': `${SITE.url}/#organization` },
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+    educationalLevel: 'Beginner to Advanced',
+    about: ['Proprietary trading firms', 'Prop firm trading', 'Funded trading accounts'],
+    teaches: [
+      'How prop firms and the funded model work',
+      'Prop firm evaluation and challenge types',
+      'Drawdown rules: daily loss, static and trailing',
+      'Consistency, news, weekend and automation rules',
+      'Position sizing and risk management',
+      'Trading psychology and passing the challenge',
+      'Payouts, profit splits and getting paid',
+      'Scaling a funded account and going professional',
+    ],
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      courseWorkload: 'PT3H',
+      instructor: { '@id': `${SITE.url}/#organization` },
+    },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', category: 'Free' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'Learn Prop Firm Trading', item: url },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+];
+
+const modules = [
+  { id: 'm1', n: 1, level: 'Beginner', title: 'What Is Prop Firm Trading?' },
+  { id: 'm2', n: 2, level: 'Beginner', title: 'The Evaluation: Challenge Types' },
+  { id: 'm3', n: 3, level: 'Core', title: 'The Rules That Breach Accounts' },
+  { id: 'm4', n: 4, level: 'Intermediate', title: 'Risk & Position Sizing' },
+  { id: 'm5', n: 5, level: 'Intermediate', title: 'Passing: Strategy & Psychology' },
+  { id: 'm6', n: 6, level: 'Advanced', title: 'Getting Funded & Paid' },
+  { id: 'm7', n: 7, level: 'Advanced', title: 'Scaling & Going Professional' },
+];
+---
+
+<Base
+  title="Learn Prop Firm Trading — Free Beginner to Advanced Course"
+  description="Learn prop firm trading free — an interactive beginner-to-advanced course with slides, diagrams and quizzes, personalised to your firm, account type and account size."
+  schema={schema}
+>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li aria-current="page">Learn Prop Firm Trading</li>
+      </ol>
+    </nav>
+  </div>
+
+  <header class="learn-hero">
+    <div class="wrap">
+      <span class="badge">Free · Interactive · No signup</span>
+      <h1>Learn Prop Firm Trading — Beginner to Advanced</h1>
+      <p class="lede">
+        The complete, free prop firm trading course: seven interactive modules that take you from
+        "what is a prop firm?" to scaling a funded account like a professional. Slides, diagrams and
+        quizzes — <strong>personalised to your firm, account type and account size</strong> so every
+        example uses <em>your</em> numbers.
+      </p>
+      <div class="hero-meta">
+        <span>📚 7 modules</span><span>🎯 7 quizzes</span><span>📊 Live examples</span>
+        <span>⏱️ ~3 hours</span><span>🆓 100% free</span>
+      </div>
+      <p><a class="btn" href="#personalize">Personalise my course ↓</a></p>
+    </div>
+  </header>
+
+  <div class="wrap learn-wrap">
+    <!-- ============ PERSONALIZATION ============ -->
+    <section id="personalize" class="pf-panel" aria-label="Personalise your lessons">
+      <h2>Teach me with my numbers</h2>
+      <p class="pf-sub">
+        Tell us what you trade and every example below updates to your real account — your drawdown
+        levels, targets, risk per trade and take-home. Nothing is stored or sent anywhere.
+      </p>
+      <div class="pf-grid">
+        <div class="tool-field">
+          <label for="pf-firm">Your prop firm</label>
+          <select id="pf-firm">
+            <option value="ftmo">FTMO</option>
+            <option value="fundednext">FundedNext</option>
+            <option value="fundingpips">FundingPips</option>
+            <option value="the5ers">The5ers</option>
+            <option value="e8">E8 Markets</option>
+            <option value="alphacapital">Alpha Capital Group</option>
+            <option value="topstep">Topstep (futures)</option>
+            <option value="apex">Apex (futures)</option>
+            <option value="myfundedfutures">MyFundedFutures (futures)</option>
+            <option value="takeprofittrader">Take Profit Trader (futures)</option>
+            <option value="other">Another / not sure yet</option>
+          </select>
+        </div>
+        <div class="tool-field">
+          <label for="pf-type">Account type</label>
+          <select id="pf-type">
+            <option value="2step">2-Step Evaluation</option>
+            <option value="1step">1-Step Evaluation</option>
+            <option value="instant">Instant Funding</option>
+            <option value="funded">Already Funded</option>
+          </select>
+        </div>
+        <div class="tool-field">
+          <label for="pf-size">Account size</label>
+          <select id="pf-size">
+            <option value="10000">$10,000</option>
+            <option value="25000">$25,000</option>
+            <option value="50000">$50,000</option>
+            <option value="100000" selected>$100,000</option>
+            <option value="200000">$200,000</option>
+            <option value="300000">$300,000</option>
+          </select>
+        </div>
+      </div>
+      <div class="pf-readout" id="pf-readout">
+        <div class="pf-stat"><span class="l">Daily loss limit</span><span class="v" data-pv="daily">—</span></div>
+        <div class="pf-stat"><span class="l">Max drawdown floor</span><span class="v" data-pv="maxfloor">—</span></div>
+        <div class="pf-stat"><span class="l">Typical target</span><span class="v" data-pv="target">—</span></div>
+        <div class="pf-stat"><span class="l">Risk/trade at 1%</span><span class="v" data-pv="risk1">—</span></div>
+      </div>
+      <p class="pf-note" id="pf-note"></p>
+    </section>
+
+    <!-- ============ COURSE NAV ============ -->
+    <section class="course-map" aria-label="Course contents">
+      <div class="cm-head">
+        <h2>Your course</h2>
+        <span class="score-badge" id="score-badge">Quiz score: 0 / 0</span>
+      </div>
+      <ol class="cm-list">
+        {modules.map((m) => (
+          <li>
+            <a href={`#${m.id}`}>
+              <span class="cm-n">{m.n}</span>
+              <span class="cm-t">{m.title}</span>
+              <span class={`cm-lvl lvl-${m.level.toLowerCase()}`}>{m.level}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- ============ MODULE 1 ============ -->
+    <section id="m1" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-beginner">Module 1 · Beginner</span><h2>What Is Prop Firm Trading?</h2></div>
+      <p class="mod-intro">
+        Proprietary ("prop") firm trading means trading a firm's capital instead of your own. You
+        prove your skill on a paid evaluation, get a <strong>funded account</strong>, and keep a
+        large share of the profits you make. You risk a modest fee — never your own capital — and in
+        return get access to buying power you'd never fund yourself. This is the foundation
+        everything else builds on. New to the term entirely? Start with
+        <a href="/guides/what-is-a-prop-firm/">what is a prop firm</a>.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">The core idea</span>
+          <h3>You trade their money, you split the profits</h3>
+          <p>A prop firm gives skilled traders capital to trade. You don't deposit trading funds; you pay a one-time <em>evaluation fee</em> to prove you can trade within their risk rules. Pass, and you trade a funded account — on <span class="hl" data-pv="firm">your firm</span> that's a <span class="hl" data-pv="size">$100,000</span> account — keeping <span class="hl" data-pv="split">80%</span> of the profits.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Why firms do this</span>
+          <h3>How prop firms make money</h3>
+          <p>Two ways: evaluation fees from the many who attempt, and a share of the profits from the skilled minority who get funded and trade well. A healthy firm wants you to pass and profit — a funded, profitable trader is a paying asset. Deep dive: <a href="/guides/how-do-prop-firms-make-money/">how prop firms make money</a>.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Simulated vs real</span>
+          <h3>What "funded" actually means</h3>
+          <p>Most modern firms run evaluations (and often funded accounts) in a <em>simulated</em> environment that mirrors real prices. You're paid a performance fee on the profit you generate, not capital gains on your own trades. That's why any strategy that only works by exploiting simulated pricing is banned.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Your deal</span>
+          <h3>The trader's risk/reward</h3>
+          <p>You risk the fee; the firm risks the capital. Downside is capped at what you paid; upside is a funded account you could never self-fund. That asymmetry is the whole appeal — but only if you have a <strong>tested edge</strong> first. Firms fund skill; they don't teach it.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 720 130" role="img" aria-label="Flow from paying a fee, to passing the evaluation, to a funded account, to a profit split">
+          <g font-family="Segoe UI, sans-serif" font-size="13" text-anchor="middle">
+            <rect x="8" y="35" width="150" height="60" rx="8" fill="#e7f2ef" stroke="#0d6b5c"/>
+            <text x="83" y="60" font-weight="700" fill="#0a5449">1 · Pay a fee</text>
+            <text x="83" y="78" fill="#4a5551">Small, one-time</text>
+            <rect x="192" y="35" width="150" height="60" rx="8" fill="#e7f2ef" stroke="#0d6b5c"/>
+            <text x="267" y="60" font-weight="700" fill="#0a5449">2 · Pass eval</text>
+            <text x="267" y="78" fill="#4a5551">Hit target, obey rules</text>
+            <rect x="376" y="35" width="150" height="60" rx="8" fill="#e7f2ef" stroke="#0d6b5c"/>
+            <text x="451" y="60" font-weight="700" fill="#0a5449">3 · Get funded</text>
+            <text x="451" y="78" fill="#4a5551">Trade firm capital</text>
+            <rect x="560" y="35" width="150" height="60" rx="8" fill="#fbf3e4" stroke="#c8871a"/>
+            <text x="635" y="60" font-weight="700" fill="#8a5e12">4 · Get paid</text>
+            <text x="635" y="78" fill="#4a5551">Keep your split</text>
+            <g stroke="#77817d" stroke-width="2" fill="none"><path d="M162 65 h26"/><path d="M346 65 h26"/><path d="M530 65 h26"/></g>
+            <g fill="#77817d"><path d="M188 65 l-8 -4 v8 z"/><path d="M372 65 l-8 -4 v8 z"/><path d="M556 65 l-8 -4 v8 z"/></g>
+          </g>
+        </svg>
+        <figcaption>The funded model in four steps — the loop every prop trader runs.</figcaption>
+      </figure>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">Quick check: as a prop trader, what do you actually put at risk?</p>
+        <button class="q-opt">Your own trading capital in the account</button>
+        <button class="q-opt" data-correct="1">Only the evaluation fee you paid</button>
+        <button class="q-opt">Your house and personal savings</button>
+        <div class="q-explain">Correct — you risk the fee, not trading capital. The firm provides (and risks) the account funds; your downside is capped at what you paid to attempt the challenge.</div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 2 ============ -->
+    <section id="m2" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-beginner">Module 2 · Beginner</span><h2>The Evaluation: Challenge Types</h2></div>
+      <p class="mod-intro">
+        The evaluation is the test that funds you. There are three main routes — one-step, two-step
+        and instant — and the differences decide how fast (and how easily) you get funded. Your
+        selected account type is <strong data-pv="typelabel">2-Step Evaluation</strong>. Compare the
+        routes in <a href="/guides/one-step-vs-two-step-challenges/">1-step vs 2-step challenges</a>.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">The three routes</span>
+          <h3>One-step, two-step, instant</h3>
+          <p><strong>Two-step</strong>: two phases, gentler per-phase rules. <strong>One-step</strong>: a single phase — faster, often tighter rules. <strong>Instant</strong>: skip the evaluation for a higher fee and trade funded immediately. Faster routes usually cost more or apply stricter rules — speed is rarely free.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">The target</span>
+          <h3>Your profit target</h3>
+          <p>Most evaluations ask for roughly 8–10% profit. On your <span class="hl" data-pv="size">$100,000</span> account that's about <span class="hl" data-pv="target">$8,000</span> to pass. Hit it <em>inside</em> the drawdown rules (Module 3) and you're funded. Instant-funding accounts have no target — you're funded from day one.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">The clock</span>
+          <h3>Time limits</h3>
+          <p>Many modern firms have removed time limits, letting you trade at your natural pace. Where a limit exists, it pressures you into lower-quality trades — one of the most common reasons good traders underperform on an evaluation. Never rush a target; forced trades breach accounts.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Passing</span>
+          <h3>What "passing" looks like</h3>
+          <p>Reach the target without breaching a daily loss limit or the max drawdown, respecting any consistency and trading rules. It's less about a heroic run and more about steady, disciplined trades that never touch a breach level. Model your real odds with the <a href="/tools/challenge-pass-simulator/">pass simulator</a>.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">On your <span class="hl" data-pv="size">$100,000</span> account, roughly how much profit does a typical evaluation require?</p>
+        <button class="q-opt">About $50,000 — half the account</button>
+        <button class="q-opt" data-correct="1"><span data-pv="target">$8,000</span> — around 8% of the account</button>
+        <button class="q-opt">$100 — a token amount</button>
+        <div class="q-explain">Correct — most evaluations target roughly 8–10% of the account. The challenge isn't the size of the target; it's hitting it without breaching a drawdown rule along the way.</div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 3 ============ -->
+    <section id="m3" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-core">Module 3 · Core</span><h2>The Rules That Breach Accounts</h2></div>
+      <p class="mod-intro">
+        This is the most important module. More funded accounts die to <strong>drawdown
+        mechanics</strong> than to anything else — not the profit target. Master these numbers before
+        your first trade. Full reference: <a href="/guides/prop-firm-drawdown-explained/">prop firm
+        drawdown explained</a>.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">Rule 1</span>
+          <h3>Daily loss limit</h3>
+          <p>The most you can lose in one trading day — usually 5%. On your account that's <span class="hl" data-pv="daily">$5,000</span>. It resets at a fixed server time (often not your local midnight), and floating losses count in real time, so an open position can breach you. Holding a loser into the reset is a classic avoidable breach.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Rule 2</span>
+          <h3>Max drawdown: static vs trailing</h3>
+          <p>The overall floor your equity can't cross. <strong>Static</strong> is fixed from your starting balance — on your account, a floor near <span class="hl" data-pv="maxfloor">$90,000</span>. <strong>Trailing</strong> follows your equity peak upward, turning profits into a rising floor. Your firm uses <strong data-pv="ddtype">static</strong> drawdown. <span data-pv="ddwarn"></span></p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Rule 3</span>
+          <h3>Consistency rules</h3>
+          <p>A cap on how much of your total profit can come from a single day (often 30–50%). Break it and the payout is usually <em>deferred</em>, not the account closed — but the panic it causes leads to the trades that <em>do</em> breach you. Details: <a href="/guides/prop-firm-consistency-rules-explained/">consistency rules explained</a>.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Rule 4</span>
+          <h3>The clauses traders skip</h3>
+          <p>News-trading windows, weekend-holding limits, minimum hold times, and bans on certain automation. None are hidden — they're all in the terms — but traders breach on clauses they never read. Before funding any account, search the rules for these specifically.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 720 200" role="img" aria-label="Two charts comparing static drawdown, where the floor stays flat, with trailing drawdown, where the floor rises behind your equity peak">
+          <g font-family="Segoe UI, sans-serif" font-size="12">
+            <text x="15" y="20" font-weight="700" fill="#0a5449">Static drawdown — floor stays put</text>
+            <polyline points="20,150 70,120 120,135 170,95 220,110 270,70" fill="none" stroke="#0d6b5c" stroke-width="2.5"/>
+            <line x1="20" y1="165" x2="290" y2="165" stroke="#b3372f" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="24" y="182" fill="#b3372f">Breach floor (fixed)</text>
+            <text x="248" y="62" fill="#0d6b5c">Equity ↑</text>
+            <text x="405" y="20" font-weight="700" fill="#8a5e12">Trailing — floor chases you up</text>
+            <polyline points="410,150 460,120 510,135 560,95 610,110 660,70" fill="none" stroke="#0d6b5c" stroke-width="2.5"/>
+            <polyline points="410,165 460,135 510,135 560,110 610,110 660,90" fill="none" stroke="#b3372f" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="470" y="182" fill="#b3372f">Breach floor rises with peak</text>
+            <text x="638" y="62" fill="#0d6b5c">Equity ↑</text>
+          </g>
+        </svg>
+        <figcaption>Static vs trailing drawdown — with trailing, a good run can make your own starting balance a breach level.</figcaption>
+      </figure>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">Why is trailing drawdown more dangerous than static drawdown?</p>
+        <button class="q-opt">It's a smaller number</button>
+        <button class="q-opt" data-correct="1">Its floor rises with your equity peak, turning profits into risk</button>
+        <button class="q-opt">It only applies on weekends</button>
+        <div class="q-explain">Correct — a trailing floor follows your highest equity upward, so after a good run even breakeven can breach you. Static drawdown stays fixed from your starting balance, giving profits a permanent cushion.</div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 4 ============ -->
+    <section id="m4" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-intermediate">Module 4 · Intermediate</span><h2>Risk &amp; Position Sizing</h2></div>
+      <p class="mod-intro">
+        Rules tell you where the walls are; risk management keeps you away from them. More traders
+        fail on sizing than on strategy — a good method sized recklessly still blows up. This module
+        is how you survive variance long enough for an edge to pay.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">Risk per trade</span>
+          <h3>Small and fixed</h3>
+          <p>Risk a consistent small percentage — 0.5% to 1% — per trade. On your account, 1% is <span class="hl" data-pv="risk1">$1,000</span>; 0.5% is <span class="hl" data-pv="risk05">$500</span>. Never increase it to chase a target or recover a loss. The size that was right this morning is right this afternoon. Translate risk to lots with the <a href="/tools/position-size-calculator/">position size calculator</a>.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Personal daily stop</span>
+          <h3>Your own circuit breaker</h3>
+          <p>Set a personal stop well inside the firm's daily limit — around <span class="hl" data-pv="dailystop">$2,000</span> against your <span class="hl" data-pv="daily">$5,000</span> official limit. Once you hit it, you're done for the day. It makes an official breach nearly impossible and, more importantly, ends revenge-trading before it compounds.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Risk of ruin</span>
+          <h3>Surviving the losing streak</h3>
+          <p>Every strategy has losing streaks. Your sizing must be small enough that a normal streak can't reach your drawdown. Two traders with the same edge get opposite results purely from size — the conservative one survives. Check your breach levels anytime with the <a href="/tools/drawdown-calculator/">drawdown calculator</a>.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">The counterintuitive truth</span>
+          <h3>Risk less to grow faster</h3>
+          <p>Trading smaller doesn't slow you down — it keeps you in the game. The account that reaches a payout isn't the one that swung biggest; it's the one that never breached. Survival is the strategy; everything else compounds from there.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">You just took two losses in a row. What's the disciplined move?</p>
+        <button class="q-opt">Double your size to win it back quickly</button>
+        <button class="q-opt" data-correct="1">Keep the same fixed risk — or stop for the day at your personal limit</button>
+        <button class="q-opt">Remove your stop-loss to give the trade room</button>
+        <div class="q-explain">Correct — fixed risk and a personal daily stop are what separate funded traders from repeat buyers. Increasing size to "get it back" is the single fastest way to breach an account.</div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 5 ============ -->
+    <section id="m5" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-intermediate">Module 5 · Intermediate</span><h2>Passing: Strategy &amp; Psychology</h2></div>
+      <p class="mod-intro">
+        Two traders can run the identical strategy and get opposite results — the difference is
+        execution and mindset. This module is about turning a positive edge into a passed challenge.
+        Practical playbook: <a href="/guides/how-to-pass-a-prop-firm-challenge/">how to pass a prop
+        firm challenge</a>.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">The foundation</span>
+          <h3>Positive expectancy</h3>
+          <p>Before anything, your method must make money over many trades — a positive <em>expectancy</em>. Win rate alone means nothing: a 40% win rate with big winners beats a 70% win rate with bigger losers. No amount of discipline rescues a losing edge, so prove yours on a demo first.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">The reframe</span>
+          <h3>Process over outcome</h3>
+          <p>You don't control whether today hits the target — that's variance. You control whether you take good setups at fixed risk. Chase the target directly and you'll force trades and over-size; focus on process and the target arrives as the byproduct of many clean trades.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">The traps</span>
+          <h3>Psychology under pressure</h3>
+          <p>The rules create predictable mental traps: target pressure (over-trading), drawdown fear (hesitation, cutting winners early), and revenge after a loss. The fix is mechanical, not willpower — fixed sizing and a personal daily stop remove the decision when your judgement is worst.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">A simple plan</span>
+          <h3>The boring pass</h3>
+          <p>Risk ~1% per trade, target a modest daily gain, stop at your personal daily limit, and let the days compound toward your <span class="hl" data-pv="target">$8,000</span> target over weeks — not in one session. Boring is the point: consistent, unremarkable days are exactly the profile firms fund.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">What should you focus on during an evaluation?</p>
+        <button class="q-opt">Hitting the profit target as fast as possible</button>
+        <button class="q-opt" data-correct="1">Executing good setups at fixed risk — the target follows</button>
+        <button class="q-opt">Taking one huge trade to clear the target at once</button>
+        <div class="q-explain">Correct — process over outcome. Chasing the target directly leads to forced trades and over-sizing; focusing on disciplined execution lets the target arrive as the cumulative result.</div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 6 ============ -->
+    <section id="m6" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-advanced">Module 6 · Advanced</span><h2>Getting Funded &amp; Paid</h2></div>
+      <p class="mod-intro">
+        Passing is the start; getting paid is the point. This module covers profit splits, payout
+        timing and the rules that decide when the money actually reaches you. Reference:
+        <a href="/guides/prop-firm-payout-methods/">prop firm payout methods</a>.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">Your split</span>
+          <h3>Profit split &amp; take-home</h3>
+          <p>You keep a share of your profits — on your firm, <span class="hl" data-pv="split">80%</span>. Make a 5% gain on your <span class="hl" data-pv="size">$100,000</span> account and your take-home is about <span class="hl" data-pv="takehome5">$4,000</span>. Model any payout with the <a href="/tools/profit-split-calculator/">profit split calculator</a>.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Timing</span>
+          <h3>When you can withdraw</h3>
+          <p>Payouts depend on a minimum number of trading days and a payout cycle (often bi-weekly, sometimes on-demand), plus processing time. Realistically, plan two to four weeks from funded to first money. Complete identity verification (KYC) early — it's the most avoidable delay.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">The buffer</span>
+          <h3>Consistency &amp; buffers at payout</h3>
+          <p>Consistency rules are checked at payout — too big a single day defers your withdrawal until more trading dilutes it. Some futures firms require a profit <em>buffer</em> before the full split applies. Keep your best day under the cap and nothing gets deferred.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Keep more</span>
+          <h3>A note on tax</h3>
+          <p>Payouts are usually paid gross as contractor-style income, with nothing withheld — setting aside tax is on you, and treatment varies by country. It's not investment income at most firms; take the specifics to a local professional. Getting paid reliably is why firm choice matters: see <a href="/guides/are-prop-firms-legit/">are prop firms legit</a>.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">Your firm pays an <span class="hl" data-pv="split">80%</span> split. You make 5% on your account. Roughly what's your take-home?</p>
+        <button class="q-opt">The full 5% — splits apply later</button>
+        <button class="q-opt" data-correct="1">About <span data-pv="takehome5">$4,000</span> — your split of the profit</button>
+        <button class="q-opt">Nothing until you double the account</button>
+        <div class="q-explain">Correct — you keep your split of the profit you make. The remainder goes to the firm, which is exactly why a high split at a reliable firm matters more than a headline number at one that doesn't pay.</div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 7 ============ -->
+    <section id="m7" class="module">
+      <div class="mod-head"><span class="mod-badge lvl-advanced">Module 7 · Advanced</span><h2>Scaling &amp; Going Professional</h2></div>
+      <p class="mod-intro">
+        The traders who build real income don't do it with one big month — they scale a funded
+        account over many consistent ones. This module is the long game. Reference:
+        <a href="/guides/prop-firm-scaling-plans-explained/">prop firm scaling plans explained</a>.
+      </p>
+
+      <div class="deck" data-deck>
+        <div class="slide active">
+          <span class="s-tag">Scaling plans</span>
+          <h3>Growing your account</h3>
+          <p>Hit consistent profit milestones without breaching and firms raise your capital — and often your split — at each tier. Growth compounds on two axes at once: a bigger balance <em>and</em> a higher percentage of it. The ceiling is rarely the limit; your breach-free streak is.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Compounding</span>
+          <h3>Two axes of growth</h3>
+          <p>From <span class="hl" data-pv="size">$100,000</span> at <span class="hl" data-pv="split">80%</span>, each milestone lifts both numbers, so cumulative take-home accelerates faster than the balance alone. Patience beats aggression here — one breach resets all scaling progress.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Go pro</span>
+          <h3>Treat it as a business</h3>
+          <p>Track every fee and payout, keep records for tax, diversify across proven firms, and treat risk management as the job. The professional edge isn't a secret setup — it's boring consistency applied for years.</p>
+        </div>
+        <div class="slide">
+          <span class="s-tag">Longevity</span>
+          <h3>Choose firms that will still pay</h3>
+          <p>All of it depends on the firm paying reliably. Favour firms with a documented, multi-year payout record over newcomers with only marketing. Start your firm research with the <a href="/best/best-prop-firms/">best prop firms rankings</a>.</p>
+        </div>
+        <div class="deck-nav"><button class="d-prev" aria-label="Previous slide">‹</button><span class="d-count">1 / 4</span><button class="d-next" aria-label="Next slide">›</button></div>
+        <div class="dots"></div>
+      </div>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 720 180" role="img" aria-label="A rising staircase showing account balance and profit split growing together across scaling milestones">
+          <g font-family="Segoe UI, sans-serif" font-size="12" text-anchor="middle">
+            <rect x="30" y="120" width="120" height="40" rx="6" fill="#e7f2ef" stroke="#0d6b5c"/>
+            <text x="90" y="138" font-weight="700" fill="#0a5449">$100k</text>
+            <text x="90" y="152" fill="#4a5551">80% split</text>
+            <rect x="200" y="90" width="120" height="70" rx="6" fill="#e7f2ef" stroke="#0d6b5c"/>
+            <text x="260" y="112" font-weight="700" fill="#0a5449">$125k</text>
+            <text x="260" y="128" fill="#4a5551">85% split</text>
+            <rect x="370" y="60" width="120" height="100" rx="6" fill="#e7f2ef" stroke="#0d6b5c"/>
+            <text x="430" y="86" font-weight="700" fill="#0a5449">$156k</text>
+            <text x="430" y="102" fill="#4a5551">90% split</text>
+            <rect x="540" y="30" width="120" height="130" rx="6" fill="#fbf3e4" stroke="#c8871a"/>
+            <text x="600" y="58" font-weight="700" fill="#8a5e12">$195k+</text>
+            <text x="600" y="74" fill="#4a5551">higher split</text>
+            <text x="360" y="18" fill="#77817d">Each milestone lifts capital and split together →</text>
+          </g>
+        </svg>
+        <figcaption>Scaling compounds on two axes — capital and split grow together, milestone after milestone (illustrative).</figcaption>
+      </figure>
+
+      <div class="quiz" data-quiz>
+        <p class="q-q">What's the biggest threat to scaling a funded account?</p>
+        <button class="q-opt">Trading too small and growing slowly</button>
+        <button class="q-opt" data-correct="1">A single breach, which resets all scaling progress</button>
+        <button class="q-opt">Choosing a firm with too high a profit split</button>
+        <div class="q-explain">Correct — one breach resets everything, so the patient, low-risk trader out-scales the aggressive one. Risk management isn't separate from growth; it <em>is</em> the growth strategy.</div>
+      </div>
+    </section>
+
+    <!-- ============ FINISH ============ -->
+    <section class="finish" id="finish">
+      <h2>You've finished the course 🎓</h2>
+      <p id="finish-msg" class="finish-msg">Answer the quizzes above to see your score.</p>
+      <p>Now apply it to your own trading. Put your numbers through the free calculators, then pick a firm built on reliability:</p>
+      <ul class="card-grid">
+        <li class="card"><span class="cat">Next step</span><h3><a href="/tools/">Free calculators</a></h3><p>Turn every lesson into your exact numbers — position size, drawdown, pass odds, payouts.</p></li>
+        <li class="card"><span class="cat">Next step</span><h3><a href="/best/best-prop-firms/">Best prop firms 2026</a></h3><p>The firms most likely to fund you and actually pay — ranked on reliability first.</p></li>
+        <li class="card"><span class="cat">Next step</span><h3><a href="/best/best-prop-firms-for-beginners/">Best for beginners</a></h3><p>Forgiving rules and fair costs for your first funded account.</p></li>
+      </ul>
+    </section>
+
+    <section class="faq" aria-label="Frequently asked questions">
+      <h2>Learn prop firm trading — FAQ</h2>
+      {faqs.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <div class="faq-a"><p set:html={f.a} /></div>
+        </details>
+      ))}
+    </section>
+  </div>
+
+  <style>
+    .learn-hero { background: var(--brand-tint); border-bottom: 1px solid var(--line); padding: 2.75rem 0 2.25rem; }
+    .learn-hero h1 { max-width: 20ch; }
+    .learn-hero .lede { font-size: 1.2rem; color: var(--ink-soft); max-width: 62ch; margin: 0.5rem 0 1.25rem; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.9rem; font-weight: 600; color: var(--brand-dark); margin-bottom: 1.5rem; }
+    .learn-wrap { padding-bottom: 2rem; }
+
+    .pf-panel { background: #fff; border: 1.5px solid var(--brand); border-radius: var(--radius); padding: 1.5rem; margin: 2rem 0; scroll-margin-top: 80px; }
+    .pf-panel h2 { margin: 0 0 0.35rem; font-size: 1.3rem; }
+    .pf-sub { margin: 0 0 1rem; color: var(--ink-soft); font-size: 0.95rem; }
+    .pf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .pf-readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 1.25rem; }
+    .pf-stat { background: var(--brand-tint); border-radius: 8px; padding: 0.7rem 0.85rem; }
+    .pf-stat .l { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+    .pf-stat .v { display: block; font-size: 1.25rem; font-weight: 800; color: var(--brand-dark); line-height: 1.25; }
+    .pf-note { font-size: 0.85rem; color: var(--ink-faint); margin: 0.85rem 0 0; }
+
+    .course-map { margin: 2.5rem 0; }
+    .cm-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .cm-head h2 { margin: 0; }
+    .score-badge { background: var(--accent-tint); border: 1px solid #ecd9b0; color: #8a5e12; font-weight: 700; font-size: 0.85rem; padding: 0.35rem 0.8rem; border-radius: 999px; }
+    .cm-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0.6rem; counter-reset: none; }
+    .cm-list a { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 0.9rem; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; text-decoration: none; color: var(--ink); font-weight: 600; transition: border-color .15s; }
+    .cm-list a:hover { border-color: var(--brand); }
+    .cm-n { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; }
+    .cm-t { flex: 1; }
+    .cm-lvl { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.15rem 0.45rem; border-radius: 999px; }
+    .lvl-beginner { background: #e7f2ef; color: #0a5449; }
+    .lvl-core { background: #e6eef7; color: #234b74; }
+    .lvl-intermediate { background: #fbf3e4; color: #8a5e12; }
+    .lvl-advanced { background: #f3e9f6; color: #6a2c74; }
+
+    .module { border-top: 1px solid var(--line); padding-top: 1.75rem; margin-top: 2.5rem; scroll-margin-top: 70px; }
+    .mod-head { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
+    .mod-head h2 { margin: 0; }
+    .mod-badge { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.25rem 0.6rem; border-radius: 999px; }
+    .mod-intro { max-width: var(--measure); color: var(--ink-soft); margin: 0.75rem 0 1.25rem; }
+
+    .deck { position: relative; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; padding: 1.5rem; margin: 1.25rem 0; max-width: 760px; }
+    .slide { display: none; min-height: 150px; animation: fade .25s ease; }
+    .slide.active { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .s-tag { display: inline-block; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.4rem; }
+    .slide h3 { margin: 0 0 0.5rem; font-size: 1.2rem; }
+    .slide p { margin: 0; color: var(--ink-soft); }
+    .hl { font-weight: 800; color: var(--brand-dark); font-variant-numeric: tabular-nums; }
+    .deck-nav { display: flex; align-items: center; justify-content: center; gap: 1.25rem; margin-top: 1.25rem; }
+    .deck-nav button { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--brand); background: #fff; color: var(--brand); font-size: 1.3rem; line-height: 1; cursor: pointer; }
+    .deck-nav button:hover { background: var(--brand); color: #fff; }
+    .deck-nav button:disabled { opacity: 0.35; cursor: default; background: #fff; color: var(--brand); }
+    .d-count { font-size: 0.85rem; font-weight: 700; color: var(--ink-faint); min-width: 44px; text-align: center; }
+    .dots { display: flex; justify-content: center; gap: 0.4rem; margin-top: 0.75rem; }
+    .dots button { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: none; background: var(--line); cursor: pointer; }
+    .dots button.on { background: var(--brand); }
+
+    .diagram { margin: 1.5rem 0; max-width: 760px; }
+    .diagram svg { width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; padding: 0.5rem; }
+    .diagram figcaption { font-size: 0.85rem; color: var(--ink-faint); margin-top: 0.5rem; }
+
+    .quiz { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); background: var(--accent-tint); padding: 1.25rem; margin: 1.5rem 0; max-width: 760px; }
+    .q-q { font-weight: 700; margin: 0 0 0.75rem; }
+    .q-opt { display: block; width: 100%; text-align: left; padding: 0.65rem 0.9rem; margin: 0.4rem 0; border: 1.5px solid var(--line); border-radius: 8px; background: #fff; font: inherit; color: var(--ink); cursor: pointer; }
+    .q-opt:hover { border-color: var(--brand); }
+    .quiz.answered .q-opt { cursor: default; }
+    .q-opt.correct { border-color: var(--brand); background: var(--brand-tint); font-weight: 700; }
+    .q-opt.wrong { border-color: var(--danger); background: var(--danger-tint); }
+    .q-explain { display: none; margin-top: 0.75rem; padding: 0.75rem 0.9rem; background: #fff; border-radius: 8px; font-size: 0.92rem; color: var(--ink-soft); }
+
+    .finish { border-top: 2px solid var(--brand); margin-top: 3rem; padding-top: 1.75rem; }
+    .finish-msg { font-size: 1.15rem; font-weight: 700; color: var(--brand-dark); }
+
+    @media (max-width: 640px) {
+      .deck, .quiz { padding: 1.1rem; }
+      .learn-hero { padding: 2rem 0 1.5rem; }
+    }
+  </style>
+
+  <script>
+    type Firm = { name: string; daily: number | null; max: number; type: string; split: number; market: string };
+    const FIRMS: Record<string, Firm> = {
+      ftmo:            { name: 'FTMO', daily: 5, max: 10, type: 'static', split: 90, market: 'forex' },
+      fundednext:      { name: 'FundedNext', daily: 5, max: 10, type: 'static', split: 90, market: 'forex' },
+      fundingpips:     { name: 'FundingPips', daily: 4, max: 8, type: 'static', split: 80, market: 'forex' },
+      the5ers:         { name: 'The5ers', daily: 5, max: 10, type: 'static', split: 80, market: 'forex' },
+      e8:              { name: 'E8 Markets', daily: 5, max: 8, type: 'trailing', split: 90, market: 'forex' },
+      alphacapital:    { name: 'Alpha Capital', daily: 4, max: 8, type: 'static', split: 80, market: 'forex' },
+      topstep:         { name: 'Topstep', daily: null, max: 4, type: 'structured', split: 90, market: 'futures' },
+      apex:            { name: 'Apex', daily: null, max: 8, type: 'trailing', split: 90, market: 'futures' },
+      myfundedfutures: { name: 'MyFundedFutures', daily: null, max: 3, type: 'trailing', split: 90, market: 'futures' },
+      takeprofittrader:{ name: 'Take Profit Trader', daily: null, max: 4, type: 'trailing', split: 80, market: 'futures' },
+      other:           { name: 'your firm', daily: 5, max: 10, type: 'static', split: 80, market: 'forex' },
+    };
+    const TYPE_LABEL: Record<string, string> = {
+      '2step': '2-Step Evaluation', '1step': '1-Step Evaluation', instant: 'Instant Funding', funded: 'Already Funded',
+    };
+
+    const $ = (id: string) => document.getElementById(id) as HTMLSelectElement;
+    const money = (n: number) => '$' + Math.round(n).toLocaleString();
+
+    function personalize() {
+      const firm = FIRMS[$('pf-firm').value] || FIRMS.other;
+      const type = $('pf-type').value;
+      const size = parseFloat($('pf-size').value) || 100000;
+      const targetPct = type === 'instant' || type === 'funded' ? 0 : 8;
+
+      const set: Record<string, string> = {
+        firm: firm.name,
+        size: money(size),
+        split: firm.split + '%',
+        ddtype: firm.type,
+        typelabel: TYPE_LABEL[type] || '',
+        daily: firm.daily ? money(size * firm.daily / 100) : 'no daily limit',
+        maxfloor: money(size - size * firm.max / 100),
+        target: targetPct ? money(size * targetPct / 100) : 'none (already funded)',
+        risk1: money(size * 0.01),
+        risk05: money(size * 0.005),
+        dailystop: firm.daily ? money(size * firm.daily / 100 * 0.4) : money(size * 0.02),
+        takehome5: money(size * 0.05 * firm.split / 100),
+        ddwarn: firm.type === 'trailing'
+          ? 'Yours trails — treat every dollar of profit as a rising floor beneath you.'
+          : firm.type === 'structured'
+          ? 'Yours uses structured loss limits — check your dashboard for the exact figures.'
+          : 'Yours is fixed, so profits give you a permanent cushion.',
+      };
+
+      document.querySelectorAll<HTMLElement>('[data-pv]').forEach((el) => {
+        const k = el.getAttribute('data-pv')!;
+        if (set[k] !== undefined) el.textContent = set[k];
+      });
+
+      const note = document.getElementById('pf-note')!;
+      note.textContent =
+        `Examples now use a ${money(size)} ${firm.name} ${TYPE_LABEL[type].toLowerCase()} account`
+        + ` (${firm.type} drawdown, ${firm.split}% split).`;
+
+      try { localStorage.setItem('pffa-learn', JSON.stringify({ f: $('pf-firm').value, t: type, s: size })); } catch (e) {}
+    }
+
+    ['pf-firm', 'pf-type', 'pf-size'].forEach((id) => $(id).addEventListener('change', personalize));
+
+    // restore saved selections
+    try {
+      const saved = JSON.parse(localStorage.getItem('pffa-learn') || 'null');
+      if (saved) {
+        if (FIRMS[saved.f]) $('pf-firm').value = saved.f;
+        if (TYPE_LABEL[saved.t]) $('pf-type').value = saved.t;
+        const opt = [...$('pf-size').options].find((o) => o.value === String(saved.s));
+        if (opt) $('pf-size').value = String(saved.s);
+      }
+    } catch (e) {}
+    personalize();
+
+    // ---- slide decks ----
+    document.querySelectorAll<HTMLElement>('[data-deck]').forEach((deck) => {
+      const slides = [...deck.querySelectorAll<HTMLElement>('.slide')];
+      const count = deck.querySelector('.d-count')!;
+      const prev = deck.querySelector('.d-prev') as HTMLButtonElement;
+      const next = deck.querySelector('.d-next') as HTMLButtonElement;
+      const dots = deck.querySelector('.dots')!;
+      let i = 0;
+      slides.forEach((_, idx) => {
+        const b = document.createElement('button');
+        b.setAttribute('aria-label', 'Go to slide ' + (idx + 1));
+        b.addEventListener('click', () => show(idx));
+        dots.appendChild(b);
+      });
+      const dotEls = [...dots.querySelectorAll('button')];
+      function show(n: number) {
+        i = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+        dotEls.forEach((d, idx) => d.classList.toggle('on', idx === i));
+        count.textContent = (i + 1) + ' / ' + slides.length;
+        prev.disabled = i === 0;
+        next.disabled = i === slides.length - 1;
+      }
+      prev.addEventListener('click', () => show(i - 1));
+      next.addEventListener('click', () => show(i + 1));
+      show(0);
+    });
+
+    // ---- quizzes + score ----
+    const quizzes = [...document.querySelectorAll<HTMLElement>('[data-quiz]')];
+    let answered = 0, correct = 0;
+    const badge = document.getElementById('score-badge')!;
+    const finishMsg = document.getElementById('finish-msg')!;
+    function updateScore() {
+      badge.textContent = `Quiz score: ${correct} / ${answered}`;
+      if (answered === quizzes.length) {
+        const pct = Math.round((correct / quizzes.length) * 100);
+        finishMsg.textContent =
+          `You scored ${correct} / ${quizzes.length} (${pct}%). `
+          + (pct === 100 ? 'Perfect — you understand the fundamentals. Time to apply them.'
+            : pct >= 70 ? 'Strong grasp of the fundamentals — review any you missed, then apply them.'
+            : 'Good start — revisit the modules you missed before risking a challenge fee.');
+      }
+    }
+    quizzes.forEach((q) => {
+      const opts = [...q.querySelectorAll<HTMLButtonElement>('.q-opt')];
+      opts.forEach((opt) => opt.addEventListener('click', () => {
+        if (q.classList.contains('answered')) return;
+        q.classList.add('answered');
+        const isRight = opt.dataset.correct === '1';
+        opt.classList.add(isRight ? 'correct' : 'wrong');
+        if (!isRight) q.querySelector<HTMLElement>('.q-opt[data-correct="1"]')!.classList.add('correct');
+        q.querySelector<HTMLElement>('.q-explain')!.style.display = 'block';
+        answered++; if (isRight) correct++;
+        updateScore();
+      }));
+    });
+  </script>
+</Base>
